@@ -58,6 +58,11 @@ export const AppShell = ({ children }: { children: React.ReactNode }) => {
             </Button>
           </div>
         </div>
+        <div className="border-t border-zinc-800 bg-zinc-900/70 px-6 py-2 md:px-10" data-testid="alpha-disclaimer-banner">
+          <p className="text-xs text-zinc-400" data-testid="alpha-disclaimer-text">
+            Alpha template: core engine for testing and iteration. External integrations are optional add-ons.
+          </p>
+        </div>
       </header>
 
       <div className="mx-auto grid w-full max-w-7xl gap-8 px-6 py-8 md:grid-cols-[260px_1fr] md:px-10">

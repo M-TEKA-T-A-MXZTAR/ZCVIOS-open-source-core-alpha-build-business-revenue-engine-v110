@@ -52,6 +52,12 @@ Build a web-based, browser-run application called â€œZC-VIOS Core v1.1.0-alphaâ€
   - Clamped inactivity level to never go below 0
   - Added authenticated regression test for future-date log rejection
   - Re-validated Monday/Tuesday reminder banner scenario with fresh account preconditions
+- GitHub-ready alpha template polish completed:
+  - Root npm-first workflow (`npm install && npm run dev`) with proxy scripts
+  - Added `.env.example` files, `CONTRIBUTING.md`, and expanded README docs
+  - Added in-app + README alpha disclaimers
+  - Added automated privacy flow test covering export + destructive delete
+  - Documented OpenAI + Google OAuth as optional placeholders only
 
 ## Prioritized Backlog
 

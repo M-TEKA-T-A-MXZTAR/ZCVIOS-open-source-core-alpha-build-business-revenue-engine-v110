@@ -16,6 +16,9 @@ export default async function Home() {
           <p className="text-xs uppercase tracking-[0.22em] text-zinc-500" data-testid="landing-version-label">
             ZC-VIOS Core v1.1.0-alpha
           </p>
+          <p className="mt-3 border border-zinc-800 bg-zinc-900/60 px-3 py-2 text-xs text-zinc-400" data-testid="landing-alpha-disclaimer">
+            Alpha disclaimer: this template is focused on core engine behavior for local dev and iterative testing.
+          </p>
           <h1 className="font-heading mt-5 text-4xl font-black tracking-tight md:text-6xl" data-testid="landing-main-heading">
             Revenue-per-hour acceleration for real operator days.
           </h1>

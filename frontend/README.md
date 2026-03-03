@@ -1,5 +1,8 @@
 # ZC-VIOS Core v1.1.0-alpha
 
+> **ALPHA DISCLAIMER**
+> Core engine template for development/testing. Not positioned as final production-hardened release.
+
 ZC-VIOS is a browser-run revenue-per-hour acceleration system.
 
 ## Stack
@@ -24,7 +27,7 @@ ZC-VIOS is a browser-run revenue-per-hour acceleration system.
 
 ## Environment variables
 
-Copy `.env.local.example` to `.env.local` and update values:
+Copy `.env.example` (or `.env.local.example`) to `.env.local` and update values:
 
 ```env
 DATABASE_URL="file:./dev.db"
@@ -33,18 +36,29 @@ NEXTAUTH_URL="http://localhost:3000/auth"
 GOOGLE_CLIENT_ID=""
 GOOGLE_CLIENT_SECRET=""
 NEXT_PUBLIC_GOOGLE_AUTH_ENABLED="false"
+REACT_APP_BACKEND_URL="http://localhost:3000"
 ```
 
 Notes:
 - Keep `NEXT_PUBLIC_GOOGLE_AUTH_ENABLED=false` until Google credentials are set.
 - OpenAI key is user-provided and stored encrypted per user in DB.
+- OpenAI and Google OAuth are optional add-ons; deterministic mode works with neither configured.
 
-## Local setup
+## Local setup (npm-first)
+
+```bash
+npm install
+npm run prisma:push
+npm run seed
+npm run dev
+```
+
+Alternative (yarn):
 
 ```bash
 yarn install
-yarn prisma db push
-node prisma/seed.mjs
+yarn prisma:push
+yarn seed
 yarn dev
 ```
 
@@ -53,6 +67,8 @@ yarn dev
 ```bash
 REACT_APP_BACKEND_URL=http://localhost:3000 pytest -q /app/backend/tests/test_rpc_auth_guards.py /app/backend/tests/test_rpc_authenticated_flows.py /app/backend/tests/test_strategy_trigger_scope.py
 ```
+
+Privacy controls (export + delete) are covered by authenticated flow tests in `test_rpc_authenticated_flows.py`.
 
 CI workflow: `.github/workflows/ci.yml`
 

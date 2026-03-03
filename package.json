@@ -1,0 +1,16 @@
+{
+  "name": "zcvios-core-alpha-template",
+  "version": "1.1.0-alpha",
+  "private": true,
+  "scripts": {
+    "postinstall": "npm --prefix frontend install",
+    "dev": "npm --prefix frontend run dev",
+    "build": "npm --prefix frontend run build",
+    "start": "npm --prefix frontend run start",
+    "lint": "npm --prefix frontend run lint",
+    "seed": "npm --prefix frontend run seed",
+    "db:push": "npm --prefix frontend run prisma:push",
+    "test:privacy": "bash -lc 'npm --prefix frontend run dev >/tmp/zcvios_test_server.log 2>&1 & SERVER_PID=$!; sleep 10; REACT_APP_BACKEND_URL=http://localhost:3000 /root/.venv/bin/python -m pytest -q backend/tests/test_rpc_authenticated_flows.py -k \"export or delete\"; EXIT_CODE=$?; kill $SERVER_PID >/dev/null 2>&1 || true; exit $EXIT_CODE'",
+    "test": "bash -lc 'npm --prefix frontend run dev >/tmp/zcvios_test_server.log 2>&1 & SERVER_PID=$!; sleep 10; REACT_APP_BACKEND_URL=http://localhost:3000 /root/.venv/bin/python -m pytest -q backend/tests/test_rpc_auth_guards.py backend/tests/test_rpc_authenticated_flows.py backend/tests/test_strategy_trigger_scope.py; EXIT_CODE=$?; kill $SERVER_PID >/dev/null 2>&1 || true; exit $EXIT_CODE'"
+  }
+}

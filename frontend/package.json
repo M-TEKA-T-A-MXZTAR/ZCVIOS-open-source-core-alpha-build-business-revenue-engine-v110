@@ -6,7 +6,10 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "prisma:generate": "prisma generate",
+    "prisma:push": "DATABASE_URL=file:./dev.db prisma db push",
+    "seed": "DATABASE_URL=file:./dev.db node prisma/seed.mjs"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.11.1",
