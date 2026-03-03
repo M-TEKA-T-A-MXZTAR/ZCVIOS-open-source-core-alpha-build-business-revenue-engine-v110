@@ -243,7 +243,7 @@ export default function WeeklyReportPage() {
           <Card testId="weekly-report-chart-card">
             <p className="text-xs uppercase tracking-[0.16em] text-zinc-500">Trend chart</p>
             <div className="mt-4 h-72" data-testid="weekly-report-trend-chart">
-              <ResponsiveContainer width="100%" height="100%">
+              <ResponsiveContainer width="100%" height="100%" minWidth={320} minHeight={240}>
                 <LineChart data={report.chartData}>
                   <XAxis dataKey="week" stroke="#a1a1aa" />
                   <YAxis stroke="#a1a1aa" />

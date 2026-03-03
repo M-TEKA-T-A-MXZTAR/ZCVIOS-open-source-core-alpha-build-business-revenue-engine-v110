@@ -45,6 +45,11 @@ export async function POST(req: Request) {
     const body = await req.json();
     const input = schema.parse(body);
     const date = startOfDay(new Date(input.date));
+    const today = startOfDay();
+
+    if (date.getTime() > today.getTime()) {
+      return NextResponse.json({ error: "Future dates are not allowed for logs." }, { status: 400 });
+    }
 
     if (!user?.fullLoggingEnabled && ["MAINTENANCE", "DRIFT"].includes(input.category)) {
       return NextResponse.json(

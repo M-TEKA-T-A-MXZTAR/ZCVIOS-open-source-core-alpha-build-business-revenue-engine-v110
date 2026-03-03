@@ -110,7 +110,8 @@ export default function SettingsPage() {
     }
 
     toast.success("Data deleted.");
-    await signOut({ callbackUrl: "/" });
+    await signOut({ redirect: false });
+    router.push("/");
   };
 
   return (

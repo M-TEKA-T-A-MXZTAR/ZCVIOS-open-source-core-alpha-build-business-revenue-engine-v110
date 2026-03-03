@@ -1,5 +1,5 @@
 import os
-from datetime import date
+from datetime import date, timedelta
 
 import pytest
 import requests
@@ -59,6 +59,7 @@ def test_authenticated_mission_and_weekly_review(base_url: str, auth_client: req
     mission_data = mission_response.json()
     assert "mission" in mission_data
     assert "lever" in mission_data["mission"]
+    assert mission_data.get("inactivityLevel", 0) >= 0
 
     review_response = auth_client.get(f"{base_url}/rpc/reports/weekly-review", timeout=20)
     assert review_response.status_code == 200
@@ -87,3 +88,20 @@ def test_authenticated_revenue_save_with_signals(base_url: str, auth_client: req
     assert data["ok"] is True
     assert "strategy" in data
     assert data["signals"]["trafficSessions"] == 140
+
+
+def test_future_dated_log_is_rejected(base_url: str, auth_client: requests.Session):
+    future_date = (date.today() + timedelta(days=2)).isoformat()
+    response = auth_client.post(
+        f"{base_url}/rpc/logs",
+        json={
+            "date": future_date,
+            "minutes": 45,
+            "category": "LEVER",
+            "completed": True,
+            "note": "future-date-should-fail",
+        },
+        timeout=20,
+    )
+    assert response.status_code == 400
+    assert "Future dates are not allowed" in response.json().get("error", "")

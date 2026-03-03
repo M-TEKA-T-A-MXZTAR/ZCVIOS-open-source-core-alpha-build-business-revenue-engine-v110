@@ -185,9 +185,10 @@ export const getOrCreateDailyMission = async ({ userId, apiKey, forceRegenerate 
     },
     orderBy: { date: "desc" },
   });
-  const daysInactive = lastLeverLog
+  const rawDaysInactive = lastLeverLog
     ? Math.floor((today.getTime() - startOfDay(lastLeverLog.date).getTime()) / (1000 * 60 * 60 * 24))
     : 999;
+  const daysInactive = Math.max(0, rawDaysInactive);
 
   if (!forceRegenerate) {
     const existing = await prisma.dailyMission.findUnique({

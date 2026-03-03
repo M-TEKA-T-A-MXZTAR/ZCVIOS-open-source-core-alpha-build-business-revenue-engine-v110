@@ -46,6 +46,12 @@ Build a web-based, browser-run application called “ZC-VIOS Core v1.1.0-alpha�
   - Policy text: “We do not sell your data.”
 - Seed/demo data included (`demo@zcvios.local / DemoPass123!`).
 - CI pipeline added (`.github/workflows/ci.yml`) with build, seed, and RPC integration tests.
+- Pre-release full QA sweep completed with blocker fixes:
+  - Fixed logout/delete redirect to stay on deployed domain (no localhost redirect)
+  - Blocked future-dated logs in `/rpc/logs`
+  - Clamped inactivity level to never go below 0
+  - Added authenticated regression test for future-date log rejection
+  - Re-validated Monday/Tuesday reminder banner scenario with fresh account preconditions
 
 ## Prioritized Backlog
 

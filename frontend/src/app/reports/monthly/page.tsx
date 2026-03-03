@@ -64,7 +64,7 @@ export default function MonthlyReportPage() {
           <Card testId="monthly-report-chart-card">
             <p className="text-xs uppercase tracking-[0.16em] text-zinc-500">Trend summary</p>
             <div className="mt-4 h-72" data-testid="monthly-report-trend-chart">
-              <ResponsiveContainer width="100%" height="100%">
+              <ResponsiveContainer width="100%" height="100%" minWidth={320} minHeight={240}>
                 <LineChart data={report.trend}>
                   <XAxis dataKey="period" stroke="#a1a1aa" />
                   <YAxis stroke="#a1a1aa" />

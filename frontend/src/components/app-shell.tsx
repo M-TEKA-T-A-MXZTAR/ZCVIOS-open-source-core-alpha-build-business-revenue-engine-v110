@@ -28,6 +28,11 @@ export const AppShell = ({ children }: { children: React.ReactNode }) => {
     return null;
   }
 
+  const handleLogout = async () => {
+    await signOut({ redirect: false });
+    router.push("/login");
+  };
+
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-100">
       <header className="border-b border-zinc-800 bg-zinc-950/95 backdrop-blur-md">
@@ -47,7 +52,7 @@ export const AppShell = ({ children }: { children: React.ReactNode }) => {
             <Button
               variant="ghost"
               data-testid="logout-button"
-              onClick={() => signOut({ callbackUrl: "/login" })}
+              onClick={handleLogout}
             >
               Sign out
             </Button>
