@@ -1,5 +1,5 @@
 import prismaClientPkg from "@prisma/client";
-import { PrismaBetterSqlite3 } from "@prisma/adapter-better-sqlite3";
+import { PrismaLibSql } from "@prisma/adapter-libsql";
 import bcrypt from "bcryptjs";
 
 const { PrismaClient } = prismaClientPkg;
@@ -9,7 +9,7 @@ if (!process.env.DATABASE_URL) {
 }
 
 const prisma = new PrismaClient({
-  adapter: new PrismaBetterSqlite3({
+  adapter: new PrismaLibSql({
     url: process.env.DATABASE_URL,
   }),
 });
