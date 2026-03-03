@@ -65,9 +65,10 @@ export const AppShell = ({ children }: { children: React.ReactNode }) => {
                   key={link.href}
                   href={link.href}
                   data-testid={`nav-link-${link.label.toLowerCase().replace(/\s+/g, "-")}`}
+                  style={active ? { color: "#09090b" } : undefined}
                   className={`block border px-3 py-2 text-sm uppercase tracking-wider transition-colors duration-200 ${
                     active
-                      ? "border-zinc-200 bg-zinc-100 text-zinc-950"
+                      ? "border-zinc-300 bg-zinc-200 text-black"
                       : "border-zinc-700 bg-zinc-950 text-zinc-300 hover:border-zinc-500"
                   }`}
                 >

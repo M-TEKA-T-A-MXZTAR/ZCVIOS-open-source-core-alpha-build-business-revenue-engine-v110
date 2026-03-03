@@ -28,7 +28,8 @@ export default async function Home() {
             <Link
               href="/register"
               data-testid="landing-create-account-link"
-              className="border border-zinc-200 bg-zinc-100 px-6 py-3 text-sm font-semibold uppercase tracking-wider text-zinc-950 transition-colors duration-200 hover:bg-white"
+              style={{ color: "#09090b" }}
+              className="border border-zinc-200 bg-zinc-100 px-6 py-3 text-sm font-semibold uppercase tracking-wider text-black transition-colors duration-200 hover:bg-white"
             >
               Create account
             </Link>
