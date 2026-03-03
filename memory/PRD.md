@@ -58,6 +58,7 @@ Build a web-based, browser-run application called â€œZC-VIOS Core v1.1.0-alphaâ€
   - Added in-app + README alpha disclaimers
   - Added automated privacy flow test covering export + destructive delete
   - Documented OpenAI + Google OAuth as optional placeholders only
+  - Added release artifacts: `CHANGELOG.md` and `RELEASE_NOTES_v1.1.0-alpha.md`
 
 ## Prioritized Backlog
 
