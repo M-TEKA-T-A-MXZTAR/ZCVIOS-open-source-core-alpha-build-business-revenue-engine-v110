@@ -11,8 +11,8 @@ jobs:
       NODE_ENV: development
       DATABASE_URL: file:./dev.db
       NEXTAUTH_SECRET: ci-nextauth-secret-zcvios
-      NEXTAUTH_URL: http://localhost:3000
-      REACT_APP_BACKEND_URL: http://localhost:3000
+      NEXTAUTH_URL: http://localhost:3001
+      REACT_APP_BACKEND_URL: http://localhost:3001
 
     steps:
       - name: Checkout
@@ -34,7 +34,7 @@ jobs:
           pip install pytest requests
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
       - name: Prepare env
         run: |
@@ -63,13 +63,13 @@ jobs:
 
       - name: Start app
         run: |
-          npm run dev > /tmp/zcvios_frontend.log 2>&1 &
+          PORT=3001 npm run dev > /tmp/zcvios_frontend.log 2>&1 &
           echo $! > /tmp/zcvios_frontend.pid
 
       - name: Wait for app
         run: |
           for i in {1..40}; do
-            if curl -fsS http://localhost:3000 >/dev/null; then
+            if curl -fsS http://localhost:3001 >/dev/null; then
               exit 0
             fi
             sleep 2
@@ -79,7 +79,7 @@ jobs:
       - name: Test
         run: |
           if npm run | grep -q " test"; then
-            npm test
+            REACT_APP_BACKEND_URL=http://localhost:3001 npm test
           fi
 
       - name: Print frontend logs on failure
