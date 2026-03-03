@@ -66,6 +66,14 @@ async function run() {
   });
 
   const weeklyRevenue = [1200, 1350, 1400, 1700, 1900, 2100];
+  const weeklySignals = [
+    { trafficSessions: 45, leadsGenerated: 6, closedSales: 2, churnedCustomers: 0, grossMarginPct: 32 },
+    { trafficSessions: 60, leadsGenerated: 9, closedSales: 2, churnedCustomers: 1, grossMarginPct: 33 },
+    { trafficSessions: 78, leadsGenerated: 11, closedSales: 3, churnedCustomers: 1, grossMarginPct: 35 },
+    { trafficSessions: 92, leadsGenerated: 13, closedSales: 4, churnedCustomers: 1, grossMarginPct: 38 },
+    { trafficSessions: 115, leadsGenerated: 15, closedSales: 5, churnedCustomers: 1, grossMarginPct: 41 },
+    { trafficSessions: 130, leadsGenerated: 17, closedSales: 6, churnedCustomers: 0, grossMarginPct: 44 },
+  ];
   const weeklyLevers = [
     "Traffic",
     "Distribution",
@@ -79,11 +87,24 @@ async function run() {
     const weekStart = weekStarts[i];
     await prisma.weeklyRevenue.upsert({
       where: { userId_weekStart: { userId: user.id, weekStart } },
-      update: { revenueCents: cents(weeklyRevenue[i]), strategyTriggered: true },
+      update: {
+        revenueCents: cents(weeklyRevenue[i]),
+        trafficSessions: weeklySignals[i].trafficSessions,
+        leadsGenerated: weeklySignals[i].leadsGenerated,
+        closedSales: weeklySignals[i].closedSales,
+        churnedCustomers: weeklySignals[i].churnedCustomers,
+        grossMarginPct: weeklySignals[i].grossMarginPct,
+        strategyTriggered: true,
+      },
       create: {
         userId: user.id,
         weekStart,
         revenueCents: cents(weeklyRevenue[i]),
+        trafficSessions: weeklySignals[i].trafficSessions,
+        leadsGenerated: weeklySignals[i].leadsGenerated,
+        closedSales: weeklySignals[i].closedSales,
+        churnedCustomers: weeklySignals[i].churnedCustomers,
+        grossMarginPct: weeklySignals[i].grossMarginPct,
         strategyTriggered: true,
         note: "Seeded weekly revenue",
       },

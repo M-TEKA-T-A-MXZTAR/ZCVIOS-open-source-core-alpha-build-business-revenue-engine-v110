@@ -24,11 +24,21 @@ const getMeta = async (userId: string) => {
   });
 
   const weeklyRevenueMissing = day >= 3 && !revenue;
+  const revenueReminderWindow = (day === 1 || day === 2) && !revenue;
+  const revenueReminderMessage =
+    day === 1
+      ? "Monday revenue check-in is due. Save this week’s revenue to refresh strategy."
+      : day === 2
+        ? "Tuesday grace window: save weekly revenue today to avoid EHR pause."
+        : "";
 
   return {
     isPaused: Boolean(pause),
     pauseUntil: pause?.endDate ?? null,
+    currentWeekRevenue: revenue ? revenue.revenueCents / 100 : null,
     weeklyRevenueMissing,
+    revenueReminderWindow,
+    revenueReminderMessage,
     weekWindowEnd: endOfWeekMonday(weekStart),
   };
 };

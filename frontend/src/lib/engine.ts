@@ -19,9 +19,16 @@ type StrategyArgs = {
   apiKey: string | null;
   weekStart: Date;
   note?: string;
+  signals?: {
+    trafficSessions?: number | null;
+    leadsGenerated?: number | null;
+    closedSales?: number | null;
+    churnedCustomers?: number | null;
+    grossMarginPct?: number | null;
+  };
 };
 
-export const runStrategyOnWeeklyRevenueSave = async ({ userId, apiKey, weekStart, note }: StrategyArgs) => {
+export const runStrategyOnWeeklyRevenueSave = async ({ userId, apiKey, weekStart, note, signals }: StrategyArgs) => {
   const recentWeeks = await prisma.weeklyRevenue.findMany({
     where: {
       userId,
@@ -76,6 +83,11 @@ export const runStrategyOnWeeklyRevenueSave = async ({ userId, apiKey, weekStart
     driftRatio: hours.driftRatio,
     weeksOnLever: previousStrategy ? 1 : 0,
     previousLever: previousStrategy?.selectedLever ?? heuristicLever,
+    trafficSessions: signals?.trafficSessions ?? latestRevenue?.trafficSessions ?? null,
+    leadsGenerated: signals?.leadsGenerated ?? latestRevenue?.leadsGenerated ?? null,
+    closedSales: signals?.closedSales ?? latestRevenue?.closedSales ?? null,
+    churnedCustomers: signals?.churnedCustomers ?? latestRevenue?.churnedCustomers ?? null,
+    grossMarginPct: signals?.grossMarginPct ?? latestRevenue?.grossMarginPct ?? null,
     note,
   });
 
@@ -312,6 +324,13 @@ export const buildWeeklyReport = async (userId: string) => {
   return {
     weekStart,
     revenue: Number(((thisWeekRevenue?.revenueCents ?? 0) / 100).toFixed(2)),
+    weeklySignals: {
+      trafficSessions: thisWeekRevenue?.trafficSessions ?? null,
+      leadsGenerated: thisWeekRevenue?.leadsGenerated ?? null,
+      closedSales: thisWeekRevenue?.closedSales ?? null,
+      churnedCustomers: thisWeekRevenue?.churnedCustomers ?? null,
+      grossMarginPct: thisWeekRevenue?.grossMarginPct ?? null,
+    },
     leverEhr,
     totalEhr,
     fullLoggingEnabled: (await prisma.user.findUnique({ where: { id: userId } }))?.fullLoggingEnabled ?? false,
@@ -331,6 +350,51 @@ export const buildWeeklyReport = async (userId: string) => {
       revenue: Number((item.revenueCents / 100).toFixed(2)),
       ehr: ehrSeries[index] ?? 0,
     })),
+  };
+};
+
+export const buildWeeklyReviewPacket = async (userId: string) => {
+  const report = await buildWeeklyReport(userId);
+  const weekStart = startOfWeekMonday();
+
+  const missionSnapshot = await prisma.dailyMission.findFirst({
+    where: {
+      userId,
+      date: {
+        gte: weekStart,
+        lte: endOfWeekMonday(weekStart),
+      },
+    },
+    orderBy: { date: "desc" },
+  });
+
+  const overrideHistory = await prisma.weeklyStrategy.findMany({
+    where: { userId, manualOverride: true },
+    orderBy: { weekStart: "desc" },
+    take: 12,
+    select: {
+      weekStart: true,
+      selectedLever: true,
+      overrideReason: true,
+      updatedAt: true,
+    },
+  });
+
+  return {
+    report,
+    missionSnapshot: missionSnapshot
+      ? {
+          date: missionSnapshot.date,
+          lever: missionSnapshot.lever,
+          primaryTask: missionSnapshot.primaryTask,
+          supportTask: missionSnapshot.supportTask,
+          doNotDoReminder: missionSnapshot.doNotDoReminder,
+          recommendedMinutes: missionSnapshot.recommendedMinutes,
+          successDefinition: missionSnapshot.successDefinition,
+          source: missionSnapshot.source,
+        }
+      : null,
+    overrideHistory,
   };
 };
 

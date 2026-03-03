@@ -96,6 +96,11 @@ model WeeklyRevenue {
   userId            String
   weekStart         DateTime
   revenueCents      Int
+  trafficSessions   Int?
+  leadsGenerated    Int?
+  closedSales       Int?
+  churnedCustomers  Int?
+  grossMarginPct    Float?
   note              String?
   strategyTriggered Boolean  @default(false)
   createdAt         DateTime @default(now())

@@ -9,6 +9,13 @@ import { Button } from "@/components/ui/button";
 
 type Report = {
   revenue: number;
+  weeklySignals: {
+    trafficSessions: number | null;
+    leadsGenerated: number | null;
+    closedSales: number | null;
+    churnedCustomers: number | null;
+    grossMarginPct: number | null;
+  };
   leverEhr: number;
   totalEhr: number;
   fullLoggingEnabled: boolean;
@@ -26,6 +33,26 @@ type Report = {
   chartData: Array<{ week: string; revenue: number; ehr: number }>;
 };
 
+type WeeklyReviewPacket = {
+  report: Report;
+  missionSnapshot: {
+    date: string;
+    lever: string;
+    primaryTask: string;
+    supportTask: string | null;
+    doNotDoReminder: string;
+    recommendedMinutes: number;
+    successDefinition: string;
+    source: string;
+  } | null;
+  overrideHistory: Array<{
+    weekStart: string;
+    selectedLever: string;
+    overrideReason: string | null;
+    updatedAt: string;
+  }>;
+};
+
 const levers = [
   "Distribution",
   "Conversion",
@@ -39,30 +66,25 @@ const levers = [
 
 export default function WeeklyReportPage() {
   const [report, setReport] = useState<Report | null>(null);
+  const [packet, setPacket] = useState<WeeklyReviewPacket | null>(null);
   const [overrideLever, setOverrideLever] = useState<(typeof levers)[number]>("Distribution");
   const [reason, setReason] = useState("");
 
   const load = async () => {
-    const response = await fetch("/rpc/reports/weekly");
+    const response = await fetch("/rpc/reports/weekly-review");
     if (!response.ok) {
       toast.error("Unable to load weekly report.");
       return;
     }
-    const payload = await response.json();
-    setReport(payload);
-    setOverrideLever(payload.lever);
+    const payload: WeeklyReviewPacket = await response.json();
+    setPacket(payload);
+    setReport(payload.report);
+    setOverrideLever(payload.report.lever as (typeof levers)[number]);
   };
 
   useEffect(() => {
     const run = async () => {
-      const response = await fetch("/rpc/reports/weekly");
-      if (!response.ok) {
-        toast.error("Unable to load weekly report.");
-        return;
-      }
-      const payload = await response.json();
-      setReport(payload);
-      setOverrideLever(payload.lever);
+      await load();
     };
 
     run();
@@ -84,13 +106,115 @@ export default function WeeklyReportPage() {
     await load();
   };
 
+  const downloadWeeklyReviewPdf = async () => {
+    try {
+      const response = await fetch("/rpc/reports/weekly-review");
+      if (!response.ok) {
+        toast.error("Unable to prepare PDF.");
+        return;
+      }
+
+      const payload: WeeklyReviewPacket = await response.json();
+      const [{ jsPDF }, autoTableModule] = await Promise.all([import("jspdf"), import("jspdf-autotable")]);
+      const autoTable = (autoTableModule.default ?? autoTableModule) as (doc: unknown, options: unknown) => void;
+      const doc = new jsPDF({ unit: "pt", format: "a4" });
+
+      doc.setFontSize(16);
+      doc.text("ZC-VIOS Weekly Review", 40, 50);
+      doc.setFontSize(10);
+      doc.text(`Generated: ${new Date().toLocaleString()}`, 40, 68);
+
+      autoTable(doc, {
+        startY: 86,
+        head: [["Metric", "Value"]],
+        body: [
+          ["Revenue", `$${payload.report.revenue.toFixed(2)}`],
+          ["Weekly Lever", payload.report.lever],
+          ["Lever EHR", `$${payload.report.leverEhr}/h`],
+          ["Total EHR", `$${payload.report.totalEhr}/h`],
+          ["4-week slope", `${payload.report.slope}%`],
+          ["Target range", `${payload.report.targetRange.min}% to ${payload.report.targetRange.max}%`],
+          ["Momentum", payload.report.momentum],
+          ["Stage", payload.report.stage],
+          ["Projection (conditional)", `$${payload.report.projection.low} - $${payload.report.projection.high} EHR`],
+          ["Traffic sessions", `${payload.report.weeklySignals.trafficSessions ?? "-"}`],
+          ["Leads generated", `${payload.report.weeklySignals.leadsGenerated ?? "-"}`],
+          ["Closed sales", `${payload.report.weeklySignals.closedSales ?? "-"}`],
+          ["Churned customers", `${payload.report.weeklySignals.churnedCustomers ?? "-"}`],
+          ["Gross margin %", `${payload.report.weeklySignals.grossMarginPct ?? "-"}`],
+        ],
+        styles: { fillColor: [255, 255, 255], textColor: [20, 20, 20], lineColor: [220, 220, 220] },
+        headStyles: { fillColor: [245, 245, 245], textColor: [10, 10, 10] },
+      });
+
+      const mission = payload.missionSnapshot;
+      const missionY = (doc as unknown as { lastAutoTable?: { finalY?: number } }).lastAutoTable?.finalY ?? 360;
+      doc.setFontSize(12);
+      doc.text("Mission Snapshot", 40, missionY + 28);
+      doc.setFontSize(10);
+
+      if (mission) {
+        autoTable(doc, {
+          startY: missionY + 36,
+          head: [["Field", "Value"]],
+          body: [
+            ["Date", new Date(mission.date).toLocaleDateString()],
+            ["Lever", mission.lever],
+            ["Primary Task", mission.primaryTask],
+            ["Support Task", mission.supportTask ?? "-"],
+            ["Do Not Do", mission.doNotDoReminder],
+            ["Recommended Minutes", `${mission.recommendedMinutes}`],
+            ["Success Definition", mission.successDefinition],
+            ["Source", mission.source],
+          ],
+          styles: { fillColor: [255, 255, 255], textColor: [20, 20, 20], lineColor: [220, 220, 220] },
+          headStyles: { fillColor: [245, 245, 245], textColor: [10, 10, 10] },
+        });
+      } else {
+        doc.text("No mission found for this week.", 40, missionY + 48);
+      }
+
+      const overrideY = (doc as unknown as { lastAutoTable?: { finalY?: number } }).lastAutoTable?.finalY ?? missionY + 80;
+      doc.setFontSize(12);
+      doc.text("Lever Override History", 40, overrideY + 28);
+
+      autoTable(doc, {
+        startY: overrideY + 36,
+        head: [["Week", "Lever", "Reason", "Updated"]],
+        body:
+          payload.overrideHistory.length > 0
+            ? payload.overrideHistory.map((item) => [
+                new Date(item.weekStart).toLocaleDateString(),
+                item.selectedLever,
+                item.overrideReason ?? "Manual override",
+                new Date(item.updatedAt).toLocaleDateString(),
+              ])
+            : [["-", "-", "No overrides recorded", "-"]],
+        styles: { fillColor: [255, 255, 255], textColor: [20, 20, 20], lineColor: [220, 220, 220] },
+        headStyles: { fillColor: [245, 245, 245], textColor: [10, 10, 10] },
+      });
+
+      doc.save(`zcvios-weekly-review-${new Date().toISOString().slice(0, 10)}.pdf`);
+      toast.success("Weekly review PDF downloaded.");
+    } catch {
+      toast.error("Unable to generate weekly review PDF.");
+    }
+  };
+
   return (
     <AppShell>
       <Card testId="weekly-report-header-card">
-        <p className="text-xs uppercase tracking-[0.16em] text-zinc-500">Weekly report</p>
-        <h2 className="font-heading mt-2 text-3xl font-black" data-testid="weekly-report-heading">
-          Weekly Performance Summary
-        </h2>
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <p className="text-xs uppercase tracking-[0.16em] text-zinc-500">Weekly report</p>
+            <h2 className="font-heading mt-2 text-3xl font-black" data-testid="weekly-report-heading">
+              Weekly Performance Summary
+            </h2>
+          </div>
+          <Button onClick={downloadWeeklyReviewPdf} data-testid="weekly-report-download-pdf-button">
+            Download weekly review PDF
+          </Button>
+        </div>
       </Card>
 
       {report && (
@@ -156,7 +280,64 @@ export default function WeeklyReportPage() {
               <p className="text-xs uppercase tracking-[0.16em] text-zinc-500">Bottleneck note</p>
               <p className="mt-1 text-sm text-zinc-300" data-testid="weekly-report-bottleneck-value">{report.bottleneckNote}</p>
             </div>
+            <div data-testid="weekly-report-traffic-row">
+              <p className="text-xs uppercase tracking-[0.16em] text-zinc-500">Traffic sessions</p>
+              <p className="mt-1 text-lg" data-testid="weekly-report-traffic-value">{report.weeklySignals.trafficSessions ?? "-"}</p>
+            </div>
+            <div data-testid="weekly-report-leads-row">
+              <p className="text-xs uppercase tracking-[0.16em] text-zinc-500">Leads generated</p>
+              <p className="mt-1 text-lg" data-testid="weekly-report-leads-value">{report.weeklySignals.leadsGenerated ?? "-"}</p>
+            </div>
+            <div data-testid="weekly-report-sales-row">
+              <p className="text-xs uppercase tracking-[0.16em] text-zinc-500">Closed sales</p>
+              <p className="mt-1 text-lg" data-testid="weekly-report-sales-value">{report.weeklySignals.closedSales ?? "-"}</p>
+            </div>
+            <div data-testid="weekly-report-churn-row">
+              <p className="text-xs uppercase tracking-[0.16em] text-zinc-500">Churned customers</p>
+              <p className="mt-1 text-lg" data-testid="weekly-report-churn-value">{report.weeklySignals.churnedCustomers ?? "-"}</p>
+            </div>
+            <div data-testid="weekly-report-margin-row">
+              <p className="text-xs uppercase tracking-[0.16em] text-zinc-500">Gross margin %</p>
+              <p className="mt-1 text-lg" data-testid="weekly-report-margin-value">{report.weeklySignals.grossMarginPct ?? "-"}</p>
+            </div>
           </Card>
+
+          {packet && (
+            <Card testId="weekly-review-packet-card">
+              <p className="text-xs uppercase tracking-[0.16em] text-zinc-500">Weekly review packet</p>
+              <div className="mt-3 grid gap-4 md:grid-cols-2">
+                <div className="border border-zinc-800 p-4" data-testid="weekly-review-mission-snapshot-card">
+                  <p className="text-xs uppercase tracking-[0.16em] text-zinc-500">Mission snapshot</p>
+                  {packet.missionSnapshot ? (
+                    <>
+                      <p className="mt-2 text-sm" data-testid="weekly-review-mission-primary-value">{packet.missionSnapshot.primaryTask}</p>
+                      <p className="mt-2 text-xs text-zinc-400" data-testid="weekly-review-mission-meta-value">
+                        {new Date(packet.missionSnapshot.date).toLocaleDateString()} · {packet.missionSnapshot.recommendedMinutes} min · {packet.missionSnapshot.source}
+                      </p>
+                    </>
+                  ) : (
+                    <p className="mt-2 text-sm text-zinc-400" data-testid="weekly-review-mission-empty-text">
+                      No mission recorded this week.
+                    </p>
+                  )}
+                </div>
+                <div className="border border-zinc-800 p-4" data-testid="weekly-review-override-history-card">
+                  <p className="text-xs uppercase tracking-[0.16em] text-zinc-500">Override history</p>
+                  <ul className="mt-2 space-y-2 text-sm" data-testid="weekly-review-override-history-list">
+                    {packet.overrideHistory.length > 0 ? (
+                      packet.overrideHistory.slice(0, 4).map((item) => (
+                        <li key={item.updatedAt} className="border border-zinc-800 p-2" data-testid="weekly-review-override-history-item">
+                          {new Date(item.weekStart).toLocaleDateString()} · {item.selectedLever}
+                        </li>
+                      ))
+                    ) : (
+                      <li className="text-zinc-400" data-testid="weekly-review-override-history-empty-text">No overrides recorded.</li>
+                    )}
+                  </ul>
+                </div>
+              </div>
+            </Card>
+          )}
 
           <Card testId="weekly-report-override-card">
             <p className="text-xs uppercase tracking-[0.16em] text-zinc-500">Lever reconsideration</p>

@@ -10,6 +10,11 @@ import { unauthorized } from "@/lib/http";
 const schema = z.object({
   revenue: z.number().min(0),
   note: z.string().max(240).optional(),
+  trafficSessions: z.number().min(0).max(100000).optional(),
+  leadsGenerated: z.number().min(0).max(100000).optional(),
+  closedSales: z.number().min(0).max(100000).optional(),
+  churnedCustomers: z.number().min(0).max(100000).optional(),
+  grossMarginPct: z.number().min(0).max(100).optional(),
   weekStart: z.string().optional(),
 });
 
@@ -36,10 +41,22 @@ export async function GET() {
   return NextResponse.json({
     weekStart,
     currentRevenue: current ? current.revenueCents / 100 : null,
+    currentSignals: {
+      trafficSessions: current?.trafficSessions ?? null,
+      leadsGenerated: current?.leadsGenerated ?? null,
+      closedSales: current?.closedSales ?? null,
+      churnedCustomers: current?.churnedCustomers ?? null,
+      grossMarginPct: current?.grossMarginPct ?? null,
+    },
     currentLever: strategy?.selectedLever ?? "Distribution",
     recent: recent.map((item) => ({
       weekStart: item.weekStart,
       revenue: item.revenueCents / 100,
+      trafficSessions: item.trafficSessions,
+      leadsGenerated: item.leadsGenerated,
+      closedSales: item.closedSales,
+      churnedCustomers: item.churnedCustomers,
+      grossMarginPct: item.grossMarginPct,
       strategyTriggered: item.strategyTriggered,
     })),
   });
@@ -59,6 +76,11 @@ export async function POST(req: Request) {
       update: {
         revenueCents: Math.round(input.revenue * 100),
         note: input.note,
+        trafficSessions: input.trafficSessions ?? null,
+        leadsGenerated: input.leadsGenerated ?? null,
+        closedSales: input.closedSales ?? null,
+        churnedCustomers: input.churnedCustomers ?? null,
+        grossMarginPct: input.grossMarginPct ?? null,
         strategyTriggered: true,
       },
       create: {
@@ -66,6 +88,11 @@ export async function POST(req: Request) {
         weekStart,
         revenueCents: Math.round(input.revenue * 100),
         note: input.note,
+        trafficSessions: input.trafficSessions ?? null,
+        leadsGenerated: input.leadsGenerated ?? null,
+        closedSales: input.closedSales ?? null,
+        churnedCustomers: input.churnedCustomers ?? null,
+        grossMarginPct: input.grossMarginPct ?? null,
         strategyTriggered: true,
       },
     });
@@ -78,6 +105,13 @@ export async function POST(req: Request) {
       apiKey,
       weekStart,
       note: input.note,
+      signals: {
+        trafficSessions: input.trafficSessions ?? null,
+        leadsGenerated: input.leadsGenerated ?? null,
+        closedSales: input.closedSales ?? null,
+        churnedCustomers: input.churnedCustomers ?? null,
+        grossMarginPct: input.grossMarginPct ?? null,
+      },
     });
 
     return NextResponse.json({
@@ -86,6 +120,13 @@ export async function POST(req: Request) {
       strategy: {
         selectedLever: strategy.selectedLever,
         reasoningSummary: strategy.reasoningSummary,
+      },
+      signals: {
+        trafficSessions: revenue.trafficSessions,
+        leadsGenerated: revenue.leadsGenerated,
+        closedSales: revenue.closedSales,
+        churnedCustomers: revenue.churnedCustomers,
+        grossMarginPct: revenue.grossMarginPct,
       },
     });
   } catch {

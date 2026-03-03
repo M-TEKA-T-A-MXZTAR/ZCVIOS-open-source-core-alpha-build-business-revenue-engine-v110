@@ -8,6 +8,7 @@ PROTECTED_RPC_ENDPOINTS = [
     "/rpc/revenue",
     "/rpc/logs",
     "/rpc/reports/weekly",
+    "/rpc/reports/weekly-review",
     "/rpc/reports/monthly",
     "/rpc/openai-key",
     "/rpc/pause",

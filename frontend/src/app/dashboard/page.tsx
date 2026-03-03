@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { AppShell } from "@/components/app-shell";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 type MissionState = {
   mission: {
@@ -21,7 +22,10 @@ type MissionState = {
   inactivityLevel: number;
   isPaused: boolean;
   pauseUntil: string | null;
+  currentWeekRevenue: number | null;
   weeklyRevenueMissing: boolean;
+  revenueReminderWindow: boolean;
+  revenueReminderMessage: string;
 };
 
 const defaultState: MissionState = {
@@ -39,24 +43,36 @@ const defaultState: MissionState = {
   inactivityLevel: 0,
   isPaused: false,
   pauseUntil: null,
+  currentWeekRevenue: null,
   weeklyRevenueMissing: false,
+  revenueReminderWindow: false,
+  revenueReminderMessage: "",
 };
 
 export default function DashboardPage() {
   const [data, setData] = useState<MissionState>(defaultState);
   const [loading, setLoading] = useState(true);
+  const [showRevenueModal, setShowRevenueModal] = useState(false);
+  const [quickRevenue, setQuickRevenue] = useState<number | "">("");
+  const [quickNote, setQuickNote] = useState("");
+  const [savingQuickRevenue, setSavingQuickRevenue] = useState(false);
+
+  const loadMission = async () => {
+    const response = await fetch("/rpc/mission");
+    if (!response.ok) {
+      toast.error("Unable to load mission.");
+      setLoading(false);
+      return;
+    }
+    const payload = await response.json();
+    setData(payload);
+    setQuickRevenue(payload.currentWeekRevenue ?? "");
+    setLoading(false);
+  };
 
   useEffect(() => {
     const run = async () => {
-      const response = await fetch("/rpc/mission");
-      if (!response.ok) {
-        toast.error("Unable to load mission.");
-        setLoading(false);
-        return;
-      }
-      const payload = await response.json();
-      setData(payload);
-      setLoading(false);
+      await loadMission();
     };
 
     run();
@@ -71,6 +87,34 @@ export default function DashboardPage() {
     const payload = await response.json();
     setData((prev) => ({ ...prev, ...payload }));
     toast.success("Mission regenerated.");
+  };
+
+  const submitQuickRevenue = async () => {
+    if (quickRevenue === "") {
+      toast.error("Enter weekly revenue first.");
+      return;
+    }
+
+    setSavingQuickRevenue(true);
+    const response = await fetch("/rpc/revenue", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        revenue: Number(quickRevenue),
+        note: quickNote,
+      }),
+    });
+
+    setSavingQuickRevenue(false);
+
+    if (!response.ok) {
+      toast.error("Unable to save weekly revenue.");
+      return;
+    }
+
+    toast.success("Weekly revenue saved and strategy refreshed.");
+    setShowRevenueModal(false);
+    await loadMission();
   };
 
   return (
@@ -95,6 +139,22 @@ export default function DashboardPage() {
           </h2>
         </Card>
       </section>
+
+      {data.revenueReminderWindow && (
+        <Card className="border-emerald-500/60" testId="dashboard-weekly-reminder-banner">
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <p className="text-sm text-emerald-200" data-testid="dashboard-weekly-reminder-text">
+              {data.revenueReminderMessage}
+            </p>
+            <Button
+              onClick={() => setShowRevenueModal(true)}
+              data-testid="dashboard-weekly-reminder-open-modal-button"
+            >
+              Quick entry
+            </Button>
+          </div>
+        </Card>
+      )}
 
       {data.weeklyRevenueMissing && (
         <Card className="border-amber-500/50" testId="dashboard-revenue-missing-banner">
@@ -171,6 +231,56 @@ export default function DashboardPage() {
           </div>
         </div>
       </Card>
+
+      {showRevenueModal && (
+        <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/80 p-6" data-testid="dashboard-revenue-modal-overlay">
+          <div className="w-full max-w-xl border border-zinc-700 bg-zinc-950 p-6" data-testid="dashboard-revenue-modal-panel">
+            <p className="text-xs uppercase tracking-[0.16em] text-zinc-500" data-testid="dashboard-revenue-modal-label">
+              Weekly revenue quick entry
+            </p>
+            <h3 className="font-heading mt-2 text-3xl font-black" data-testid="dashboard-revenue-modal-heading">
+              Monday/Tuesday cadence
+            </h3>
+
+            <div className="mt-5 grid gap-4">
+              <div>
+                <label className="mb-2 block text-xs uppercase tracking-[0.16em] text-zinc-500">Revenue ($)</label>
+                <Input
+                  type="number"
+                  value={quickRevenue}
+                  onChange={(e) => setQuickRevenue(e.target.value === "" ? "" : Number(e.target.value))}
+                  data-testid="dashboard-revenue-modal-input"
+                />
+              </div>
+              <div>
+                <label className="mb-2 block text-xs uppercase tracking-[0.16em] text-zinc-500">Optional note</label>
+                <Input
+                  value={quickNote}
+                  onChange={(e) => setQuickNote(e.target.value)}
+                  data-testid="dashboard-revenue-modal-note-input"
+                />
+              </div>
+            </div>
+
+            <div className="mt-6 flex flex-wrap gap-3">
+              <Button
+                onClick={submitQuickRevenue}
+                disabled={savingQuickRevenue}
+                data-testid="dashboard-revenue-modal-save-button"
+              >
+                {savingQuickRevenue ? "Saving..." : "Save and refresh strategy"}
+              </Button>
+              <Button
+                variant="ghost"
+                onClick={() => setShowRevenueModal(false)}
+                data-testid="dashboard-revenue-modal-cancel-button"
+              >
+                Cancel
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </AppShell>
   );
 }
