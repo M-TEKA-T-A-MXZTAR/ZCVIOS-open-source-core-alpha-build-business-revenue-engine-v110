@@ -43,7 +43,6 @@ Required for local run:
 Optional add-ons:
 - `GOOGLE_CLIENT_ID`
 - `GOOGLE_CLIENT_SECRET`
-- `NEXT_PUBLIC_GOOGLE_AUTH_ENABLED`
 
 ## Known alpha boundaries
 - Production go-live hardening is out of scope for this alpha template.
