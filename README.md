@@ -1,111 +1,108 @@
-# ZC-VIOS Core v1.1.0-alpha (Template)
+# ZC-VIOS Core v1.1.0-alpha
 
 > **ALPHA DISCLAIMER**
-> This is an alpha template focused on core engine behavior. It is intended for local development, validation, and iterative improvement.
+> This repository is an alpha template focused on core engine stability and reproducible local development.
 
-ZC-VIOS converts weekly revenue intent into a single weekly lever and concise daily mission system.
+## Architecture (aligned)
 
-## What this alpha includes
+- **Framework:** Next.js (App Router) full-stack (API routes in `src/app/rpc/*`)
+- **Database:** SQLite
+- **ORM:** Prisma (`/prisma/schema.prisma`)
+- **Auth:** NextAuth (email/password active, Google OAuth optional placeholder)
 
-- Email/password auth (working locally)
-- Deterministic core mode (no OpenAI key required)
-- Optional OpenAI field and optional Google OAuth placeholders
-- Weekly revenue trigger → strategy lever selection
-- Daily mission rendering + manual logging
-- Weekly + monthly reports with charts
-- Privacy controls (export + delete account/data)
-- Seeded demo account and data timeline
-
-## Repository structure
+## Repository structure (minimal alpha)
 
 ```txt
-/frontend   Next.js App Router + Prisma + SQLite app
-/backend    Python test suite for API/regression checks
-/memory     Build notes / PRD snapshot
+/prisma
+/src
+/public
+/tests
+.env.example
+README.md
+CHANGELOG.md
+RELEASE_NOTES_v1.1.0-alpha.md
+package.json
 ```
 
-## Quick start (npm-first)
+## Local setup (fresh clone)
 
-From repo root:
-
+1) Install dependencies
 ```bash
 npm install
-npm run db:push
+```
+
+2) Create local environment file
+```bash
+cp .env.example .env.local
+```
+Set a value for `NEXTAUTH_SECRET` in `.env.local` before running auth flows.
+
+3) Run Prisma migration
+```bash
+npx prisma migrate dev
+```
+
+4) Seed demo data
+```bash
 npm run seed
+```
+
+5) Start app
+```bash
 npm run dev
 ```
 
-Then open `http://localhost:3000`.
+Open: `http://localhost:3000`
 
-Demo login:
-- `demo@zcvios.local`
-- `DemoPass123!`
+Demo account:
+- Email: `demo@zcvios.local`
+- Password: `DemoPass123!`
 
 ## Environment variables
 
-Copy:
+Defined in `.env.example`:
 
-```bash
-cp frontend/.env.example frontend/.env.local
+```env
+NODE_ENV=development
+DATABASE_URL="file:./dev.db"
+NEXTAUTH_SECRET=
+NEXTAUTH_URL=http://localhost:3000
+GOOGLE_CLIENT_ID=
+GOOGLE_CLIENT_SECRET=
+OPENAI_API_KEY=
 ```
 
-Required variables:
+Notes:
+- **Deterministic mode works without OpenAI key.**
+- **Google OAuth is optional** (placeholder only in alpha).
 
-- `DATABASE_URL` (SQLite for local)
-- `NEXTAUTH_SECRET`
-- `NEXTAUTH_URL`
+## Validation targets (alpha)
 
-Optional add-ons (placeholders only in alpha):
-
-- `GOOGLE_CLIENT_ID`
-- `GOOGLE_CLIENT_SECRET`
-- `NEXT_PUBLIC_GOOGLE_AUTH_ENABLED`
-
-OpenAI is BYO per-user via Settings UI and is **optional**.
-
-## Deterministic mode (no external integrations)
-
-This app runs end-to-end without OpenAI and without Google OAuth.
-
-- If no OpenAI key is saved, missions and strategy use deterministic templates/heuristics.
-- Google OAuth stays disabled until env values are explicitly set.
-
-## Core definition-of-done coverage
-
-1. `npm install && npm run dev` launches usable app.
-2. User can sign up / sign in via email-password.
-3. Weekly revenue save triggers strategy and sets weekly lever.
-4. Daily mission renders and logs can be created.
-5. Weekly/monthly reports render charts.
-6. Export data works.
-7. Delete account/data works.
-8. Deterministic mode works with no external keys.
-9. OpenAI + Google are documented as optional placeholders.
+- Email/password signup + login works.
+- Weekly revenue entry triggers strategy selection (single weekly lever).
+- Daily mission renders and work sessions can be logged.
+- Weekly + monthly reports render with charts.
+- Privacy controls work: export data + delete account/data.
 
 ## Tests
 
-Run full regression (includes auth guards, strategy trigger scope, deterministic flows):
+Keep the app running (`npm run dev`) in one terminal, then run tests in another.
 
+Full regression:
 ```bash
 npm run test
 ```
 
-Run privacy-focused checks (export + delete path):
-
+Privacy-only path:
 ```bash
 npm run test:privacy
 ```
 
-## Build
+## Non-goals for this alpha pass
 
-```bash
-npm run build
-```
-
-## Optional add-on notes
-
-- **OpenAI (optional)**: user enters API key in Settings; no key required for core operation.
-- **Google OAuth (optional)**: fill Google env vars + enable flag; otherwise credentials auth remains primary.
+- Production deployment steps
+- Custom domain configuration
+- Forced OAuth go-live integration
 
 ## License
 

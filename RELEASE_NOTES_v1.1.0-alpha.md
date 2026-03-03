@@ -4,6 +4,7 @@
 Alpha template release focused on core engine stability and local developer usability.
 
 ## What’s included
+- Repository aligned to clean Next.js full-stack root layout for GitHub release
 - Email/password auth and onboarding CRUD
 - Deterministic strategy + mission flow without OpenAI key
 - Weekly revenue trigger for strategy selection (single weekly lever)
@@ -16,7 +17,7 @@ Alpha template release focused on core engine stability and local developer usab
 ## Local quick-start
 ```bash
 npm install
-npm run db:push
+npx prisma migrate dev
 npm run seed
 npm run dev
 ```
@@ -32,7 +33,7 @@ Demo account:
 
 ## Environment variables
 Use placeholders from:
-- `frontend/.env.example`
+- `.env.example`
 
 Required for local run:
 - `DATABASE_URL`

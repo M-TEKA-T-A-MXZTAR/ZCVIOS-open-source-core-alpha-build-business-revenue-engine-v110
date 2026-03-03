@@ -1,50 +1,95 @@
 {
-  "summary": "Executed backend auth-guard API tests (pytest) and frontend E2E flows for landing, login, dashboard, revenue, logs, reports, settings, onboarding on public URL. Core product flows are functional.",
+  "summary": "Executed backend pytest regression and focused UI smoke/integration checks for auth, revenue strategy trigger path, reports, and privacy controls. Public landing route is reachable, but authenticated and data-dependent flows are blocked by runtime backend dependency failure.",
   "backend_issues": {
-    "critical": [],
-    "minor": []
+    "critical": [
+      {
+        "endpoint": "/rpc/register",
+        "issue": "Returns 400 for valid payloads because Prisma cannot load better-sqlite3 native bindings in runtime (logged repeatedly as 'Could not locate the bindings file'). Route catches all errors and masks infrastructure failure as validation error.",
+        "priority": "CRITICAL"
+      },
+      {
+        "endpoint": "/auth/callback/credentials",
+        "issue": "Demo login fails with 401 due to DB access failure in auth credential lookup path (same Prisma better-sqlite3 binding problem).",
+        "priority": "CRITICAL"
+      },
+      {
+        "endpoint": "/rpc/revenue, /rpc/mission, /rpc/reports/*, /rpc/data-export, /rpc/data-delete",
+        "issue": "Authenticated flows untestable end-to-end because account creation/login fail upstream; business-critical flows blocked.",
+        "priority": "HIGH"
+      }
+    ],
+    "minor": [
+      {
+        "endpoint": "tests base_url fixtures",
+        "issue": "Test fixtures default to localhost when REACT_APP_BACKEND_URL is missing; this diverges from required public-endpoint-only policy."
+      }
+    ]
   },
   "frontend_issues": {
     "ui_bugs": [
       {
-        "component": "Landing CTA + active sidebar nav item",
-        "issue": "Text appears invisible/very low contrast on light background (e.g., Create account button and active nav item render as blank in screenshots).",
-        "selector": "[data-testid='landing-create-account-link'], [data-testid^='nav-link-'] (active state)",
-        "priority": "HIGH"
+        "component": "Global app styling/static assets",
+        "issue": "Next static CSS/JS/font chunk requests return 500, leaving pages mostly unstyled and potentially partially non-interactive.",
+        "selector": "_next/static/chunks/*, _next/static/media/*",
+        "priority": "CRITICAL"
       }
     ],
-    "integration_issues": [],
+    "integration_issues": [
+      {
+        "flow": "Email/password signup + login",
+        "issue": "UI submits but remains on /register? or /login? due to backend failure. No successful session created.",
+        "affected_selectors": [
+          "[data-testid='register-submit-button']",
+          "[data-testid='login-submit-button']"
+        ]
+      },
+      {
+        "flow": "Weekly revenue trigger, mission logging, weekly/monthly reports, privacy export/delete",
+        "issue": "Blocked because authentication and DB-dependent RPC routes fail before entering protected flows.",
+        "affected_selectors": [
+          "[data-testid='landing-login-link']",
+          "[data-testid='register-submit-button']"
+        ]
+      }
+    ],
     "design_issues": [
       {
-        "screen": "Landing and authenticated shell",
+        "screen": "Landing/Login/Register",
         "issues": [
-          "Critical contrast/readability issue on light-background CTA/active nav states."
+          "Design system styles are not applied due to static chunk 500 responses; visual hierarchy and spacing degrade to browser defaults."
         ]
       }
     ]
   },
   "test_report_links": [
-    "/app/backend/tests/test_rpc_auth_guards.py",
+    "/app/tests/test_rpc_auth_guards.py",
+    "/app/tests/test_rpc_authenticated_flows.py",
+    "/app/tests/test_strategy_trigger_scope.py",
     "/app/test_reports/pytest/pytest_results.xml"
   ],
   "action_items": [
-    "Fix CTA and active-navigation text contrast/readability for light-background variants.",
-    "Re-verify Tailwind class generation/theme tokens for text-zinc-950 usage in production build."
+    "Fix runtime better-sqlite3 native binding resolution in the deployed container (install/rebuild correct binary for current Node/arch) so Prisma can connect.",
+    "Avoid broad catch-all masking in /rpc/register; return 500 for infrastructure errors and reserve 400 for real validation failures.",
+    "Restore Next static asset serving (500s on /_next/static/*) so CSS/JS/fonts load and UI behaves correctly.",
+    "Provide/configure required public URL env (REACT_APP_BACKEND_URL equivalent) for test/runtime consistency; remove localhost fallback in tests if policy requires public endpoint only.",
+    "After infra fix, rerun authenticated regression tests and full UI journey (dashboard/revenue/logs/reports/settings privacy)."
   ],
   "critical_code_review_comments": [
-    "`/app/frontend/src/lib/prisma.ts` uses a fallback `process.env.DATABASE_URL ?? 'file:./dev.db'`; strict env policy requires failing fast when env var is missing (no default DB URL)."
+    "Over-broad exception handling in /rpc/register hides server/runtime errors as client validation errors, making RCA harder.",
+    "Auth and core RPC paths have hard dependency on Prisma startup health; no graceful health gate or dependency check exposed.",
+    "Repository still has multi-lockfile/root ambiguity from consolidation (warnings in runtime logs), increasing startup/config fragility."
   ],
   "updated_files": [
-    "/app/backend/tests/test_rpc_auth_guards.py",
     "/app/test_reports/iteration_1.json"
   ],
   "success_rate": {
-    "backend": "100%",
-    "frontend": "92%"
+    "backend": "75%",
+    "frontend": "30%"
   },
   "seed_data_creation": "None",
   "retest_needed": true,
-  "should_main_agent_self_test": true,
-  "context_for_next_testing_agent": "Demo account login works. Protected /rpc routes return 401 without session. Revenue/log/report/settings/onboarding flows exercised. Category restriction is enforced when fullLoggingEnabled=false (verified via authenticated API call returning 400 for MAINTENANCE).",
-  "rca of the issue": "Reproduction: open landing page and authenticated dashboard sidebar; observe blank-looking text on light backgrounds. Likely root cause is theme/class token mismatch where intended dark text class on light surfaces is not applied at runtime. Mitigation: force explicit contrast-safe class (e.g., text-black) for light CTA/active states and validate in production build."
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Pytest run completed: 28 total, 21 passed, 3 failed, 4 errors. Primary blocker is Prisma better-sqlite3 binding load failure from frontend runtime logs; auth and register blocked. UI automation confirmed landing/login/register pages render but static chunks return 500 and styling is broken. Re-test only after dependency/runtime fix.",
+  "rca of the issue": "Repro: run pytest on /app/tests/*.py -> auth guard tests pass, authenticated/signup tests fail. Logs show repeated 'prisma:error Could not locate the bindings file ... better_sqlite3.node'. Because DB access fails, /rpc/register catch block returns 400 'Invalid input', and credentials auth returns 401. Also /_next/static/* chunk requests return 500 causing unstyled UI. Mitigation: rebuild/install architecture-compatible better-sqlite3 binary and ensure static build/dev serving is correctly configured after root consolidation; then rerun seed + auth flow tests.",
+  "mocked_api": "No MOCKED APIs used in this test run."
 }

@@ -4,6 +4,14 @@ All notable changes to this project are documented in this file.
 
 ## v1.1.0-alpha - 2026-03-03
 
+### Stabilization alignment (GitHub-ready)
+- Consolidated repository to a standard Next.js full-stack root structure.
+- Moved API/regression tests into `/tests`.
+- Added root `.env.example` for reproducible local setup.
+- Added root Prisma migration baseline and schema alignment models:
+  `User`, `WeeklyRevenue`, `WorkLogSession`, `WeeklyPlan`, `FreedomDefinition`.
+- Removed legacy scaffolding folders used only for internal build iteration.
+
 ### Added
 - Root npm-first workflow for local development (`npm install`, `npm run dev`, `npm run build`, `npm run test`).
 - GitHub-ready project docs and hygiene files:
