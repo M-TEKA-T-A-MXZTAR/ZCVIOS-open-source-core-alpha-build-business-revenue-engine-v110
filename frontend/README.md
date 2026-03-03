@@ -17,6 +17,9 @@ ZC-VIOS is a browser-run revenue-per-hour acceleration system.
 - Deterministic fallback when no OpenAI key exists
 - Lever-first logging with optional full logging toggle
 - Weekly and monthly reports with EHR, slope, stage, target range, projection, and neutral notes
+- Monday/Tuesday cadence reminders with dashboard quick-entry modal for weekly revenue
+- Weekly strategy signal inputs: traffic sessions, leads, closed sales, churned customers, gross margin %
+- Weekly Review PDF export (weekly metrics + mission snapshot + lever override history)
 - Pause mode, inactivity response, data export, and data deletion
 
 ## Environment variables
@@ -44,6 +47,14 @@ yarn prisma db push
 node prisma/seed.mjs
 yarn dev
 ```
+
+## Tests
+
+```bash
+REACT_APP_BACKEND_URL=http://localhost:3000 pytest -q /app/backend/tests/test_rpc_auth_guards.py /app/backend/tests/test_rpc_authenticated_flows.py /app/backend/tests/test_strategy_trigger_scope.py
+```
+
+CI workflow: `.github/workflows/ci.yml`
 
 ## Demo account
 

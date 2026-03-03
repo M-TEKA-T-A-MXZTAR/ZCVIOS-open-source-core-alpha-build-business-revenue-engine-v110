@@ -28,11 +28,14 @@ Build a web-based, browser-run application called ‚ÄúZC-VIOS Core v1.1.0-alpha‚Ä
 - Daily Mission: command-mode mission cards with support task/start-now/do-not-do/success definition.
 - Manual Logging: lever-focused categories by default; maintenance/drift controlled by full logging setting.
 - Weekly Revenue Entry: save revenue and run strategy trigger.
+- Monday/Tuesday cadence UX: persistent reminder banner + dashboard quick-entry modal (non-blocking).
+- Strategy signal capture on revenue save: traffic sessions, leads, closed sales, churned customers, gross margin %.
 - Metrics/Reports:
   - Lever EHR, total EHR (when full logging enabled), 4-week slope
   - Stage and target range with momentum status
   - Conditional projection range
   - Weekly + monthly report views with charts
+- Weekly Review PDF export: weekly metrics + mission snapshot + lever override history.
 - Drift + pause/inactivity handling:
   - Drift captured from logs and reflected in strategy adjustment
   - Pause mode (1 week, 2 weeks, custom date)
@@ -42,13 +45,14 @@ Build a web-based, browser-run application called ‚ÄúZC-VIOS Core v1.1.0-alpha‚Ä
   - Full account data deletion
   - Policy text: ‚ÄúWe do not sell your data.‚Äù
 - Seed/demo data included (`demo@zcvios.local / DemoPass123!`).
+- CI pipeline added (`.github/workflows/ci.yml`) with build, seed, and RPC integration tests.
 
 ## Prioritized Backlog
 
 ### P0 (Critical)
-- Add explicit Monday/Tuesday UX enforcement prompts for weekly revenue cadence (currently logic supports missing-state banner).
-- Add richer heuristic inputs (traffic/churn/margin signals) to strategy context forms.
-- Add authenticated end-to-end tests for all `/rpc/*` paths in CI.
+- Add CSRF/session hardening checks around automated credential callback test path.
+- Add deterministic strategy trace fields (which rule fired) for auditability in weekly report.
+- Add server-side PDF endpoint option for non-browser automation/export jobs.
 
 ### P1 (Important)
 - Add Insight Mode UI toggle and compact interpretation panel while keeping neutral tone.
@@ -61,8 +65,8 @@ Build a web-based, browser-run application called ‚ÄúZC-VIOS Core v1.1.0-alpha‚Ä
 - Add localization framework and timezone-aware week boundaries.
 
 ## Next Tasks
-1. Add Monday reminder workflow and Tuesday grace-state assistant copy.
-2. Add AI response audit log per strategy/mission generation (without storing sensitive API keys).
-3. Add richer trend diagnostics (execution consistency bands and drift streak timeline).
-4. Add production hardening: CSRF validation review, stronger key-management UX, and integration tests in CI.
+1. Add AI response audit log per strategy/mission generation (without storing sensitive API keys).
+2. Add richer trend diagnostics (execution consistency bands and drift streak timeline).
+3. Add stricter CSRF/session hardening checks and security regression tests.
+4. Extend CI with browser-level smoke run for PDF export + reminder modal.
 
