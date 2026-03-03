@@ -1,0 +1,68 @@
+{
+  "summary": "Executed pre-release full-system QA on public URL covering auth/session lifecycle, protected RPC auth guards, onboarding save flow, logs/revenue/report integrations, pause controls, export/delete privacy flows on temporary accounts, and baseline route accessibility in deterministic mode.",
+  "backend_issues": {
+    "critical": [
+      {
+        "endpoint": "/rpc/mission",
+        "issue": "Mission payload can return negative inactivityLevel (observed -3), indicating future-dated logs are influencing inactivity math.",
+        "priority": "HIGH"
+      }
+    ],
+    "minor": [
+      {
+        "endpoint": "/rpc/logs",
+        "issue": "Allows future-dated entries; no guard prevents dates beyond current day, which can corrupt inactivity behavior."
+      }
+    ]
+  },
+  "frontend_issues": {
+    "ui_bugs": [
+      {
+        "component": "Auth logout redirect (AppShell logout + settings destructive delete signOut)",
+        "issue": "After logout/delete, browser is redirected to http://localhost:3000/... instead of staying on public domain.",
+        "selector": "[data-testid='logout-button'], [data-testid='settings-delete-button']",
+        "priority": "CRITICAL"
+      }
+    ],
+    "integration_issues": [
+      {
+        "flow": "Monday/Tuesday reminder banner + quick-entry modal",
+        "issue": "Could not reproduce banner in this run because reminder preconditions were not met in current server-day/account state (banner count 0).",
+        "affected_selectors": [
+          "[data-testid='dashboard-weekly-reminder-banner']",
+          "[data-testid='dashboard-weekly-reminder-open-modal-button']"
+        ]
+      }
+    ],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_rpc_auth_guards.py",
+    "/app/backend/tests/test_rpc_authenticated_flows.py",
+    "/app/backend/tests/test_strategy_trigger_scope.py",
+    "/app/test_reports/pytest/pytest_results.xml"
+  ],
+  "action_items": [
+    "Fix auth callback/redirect base URL configuration so logout/delete never redirect to localhost in preview/prod.",
+    "Add validation to block future dates in /rpc/logs (or clamp inactivity calculation to >=0) and harden inactivity metric logic in engine.",
+    "Re-run cadence banner scenario with deterministic date control or seeded Monday/Tuesday preconditions for guaranteed UI verification.",
+    "Investigate Recharts console warnings on weekly/monthly report render (container width/height -1) to avoid runtime noise."
+  ],
+  "critical_code_review_comments": [
+    "frontend/.env.local sets NEXTAUTH_URL to http://localhost:3000/auth; this is causing cross-domain redirect behavior in auth flows on public preview domain.",
+    "In engine.ts daysInactive is not clamped and can become negative when log dates are in the future.",
+    "logs route validates min/max minutes but does not enforce date <= today, allowing temporal data corruption for inactivity-dependent UX."
+  ],
+  "updated_files": [
+    "/app/test_reports/iteration_3.json"
+  ],
+  "success_rate": {
+    "backend": "100% (26/26 pytest pass)",
+    "frontend": "88% of targeted critical flows"
+  },
+  "seed_data_creation": "Created temporary accounts via /register for destructive tests: qa.temp.*@zcvios.local and qa.delete.*@zcvios.local; created onboarding/log/revenue data during UI tests and deleted one temporary account end-to-end.",
+  "retest_needed": true,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "All backend regression tests passed on public URL after exporting env from frontend/.env. Core login/protected navigation/revenue/reports/settings/export/delete flows are working. Critical reproducible issue: logout (and delete signOut) redirects to localhost URL. Cadence reminder banner did not appear in this run due unmet day/state preconditions; requires deterministic date-control retest.",
+  "rca of the issue": "RCA-1 (critical): Auth logout redirect uses localhost base because NEXTAUTH_URL is configured as http://localhost:3000/auth in frontend/.env.local; on preview domain this causes redirect to localhost path after signOut callbacks. Repro: login on https://lever-daily.preview.emergentagent.com -> click Sign out -> URL becomes http://localhost:3000/login. RCA-2: inactivityLevel negative because /rpc/logs allows future dates and engine computes raw day delta without lower-bound clamp. Repro: mission API returned inactivityLevel=-3 while isPaused=true, showing temporal inconsistency risk for inactivity/pause UX."
+}
