@@ -111,7 +111,7 @@ export default function SettingsPage() {
 
     toast.success("Data deleted.");
     await signOut({ redirect: false });
-    router.push("/");
+    router.push("/login");
   };
 
   return (
