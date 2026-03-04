@@ -37,15 +37,7 @@ jobs:
         run: npm ci
 
       - name: Prepare env
-        run: |
-          cp .env.example .env.local
-          python - <<'PY'
-          from pathlib import Path
-          p = Path('.env.local')
-          s = p.read_text()
-          s = s.replace('NEXTAUTH_SECRET=', 'NEXTAUTH_SECRET=ci-nextauth-secret-zcvios')
-          p.write_text(s)
-          PY
+        run: cp .env.example .env.local
 
       - name: Run DB migrations and seed
         run: |
