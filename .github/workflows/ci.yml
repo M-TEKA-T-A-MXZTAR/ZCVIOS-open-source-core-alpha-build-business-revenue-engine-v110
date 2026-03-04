@@ -37,7 +37,17 @@ jobs:
         run: npm ci
 
       - name: Prepare env
-        run: cp .env.example .env.local
+        run: |
+          if [ -f .env.example ]; then
+            cp .env.example .env.local
+          elif [ -f app/.env.example ]; then
+            cp app/.env.example .env.local
+          else
+            echo "ERROR: .env.example not found in repo root or app/"
+            ls -la
+            find . -maxdepth 3 -name ".env.example" -print
+            exit 1
+          fi
 
       - name: Run DB migrations and seed
         run: |
