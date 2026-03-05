@@ -6,29 +6,28 @@ export default function GlobalError({
   error,
   reset,
 }: {
-  error: unknown;
+  error: Error & { digest?: string };
   reset: () => void;
 }) {
-  React.useEffect(() => {
-    // log for debugging without crashing build
-    // eslint-disable-next-line no-console
-    console.error("GlobalError boundary caught:", error);
-  }, [error]);
-
   return (
     <html>
-      <body style={{ fontFamily: "system-ui", padding: 24 }}>
-        <h1 style={{ margin: 0 }}>Something went wrong</h1>
-        <p style={{ marginTop: 12, opacity: 0.85 }}>
-          The app hit an unexpected error. You can try again.
+      <body style={{ padding: 24, fontFamily: "system-ui, sans-serif" }}>
+        <h1>Something went wrong</h1>
+        <p style={{ opacity: 0.8 }}>
+          A global error occurred. Try again, or refresh the page.
         </p>
+
+        <pre style={{ whiteSpace: "pre-wrap", opacity: 0.7 }}>
+          {error?.message}
+        </pre>
+
         <button
-          onClick={reset}
+          onClick={() => reset()}
           style={{
             marginTop: 16,
             padding: "10px 14px",
             borderRadius: 8,
-            border: "1px solid #ccc",
+            border: "1px solid #888",
             cursor: "pointer",
           }}
         >

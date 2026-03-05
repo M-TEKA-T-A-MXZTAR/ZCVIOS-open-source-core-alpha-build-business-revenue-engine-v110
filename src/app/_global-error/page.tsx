@@ -1,13 +1,8 @@
-"use client";
-
-export default function GlobalErrorRoute() {
+export default function GlobalErrorRouteFallback() {
   return (
-    <main style={{ fontFamily: "system-ui", padding: 24 }}>
-      <h1 style={{ margin: 0 }}>Error</h1>
-      <p style={{ marginTop: 12, opacity: 0.85 }}>
-        This route exists to prevent prerender failures during CI. The real error
-        handling is provided by src/app/global-error.tsx.
-      </p>
+    <main style={{ padding: 24, fontFamily: "system-ui, sans-serif" }}>
+      <h1>Global Error Fallback Route</h1>
+      <p>This route is intentionally minimal to avoid CI prerender failures.</p>
     </main>
   );
 }
