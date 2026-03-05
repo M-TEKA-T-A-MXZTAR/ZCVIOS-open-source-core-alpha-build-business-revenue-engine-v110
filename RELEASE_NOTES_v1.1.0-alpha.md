@@ -36,13 +36,16 @@ Use placeholders from:
 - `.env.example`
 
 Required for local run:
+- `NODE_ENV`
 - `DATABASE_URL`
 - `NEXTAUTH_SECRET`
 - `NEXTAUTH_URL`
+- `REACT_APP_BACKEND_URL`
 
 Optional add-ons:
 - `GOOGLE_CLIENT_ID`
 - `GOOGLE_CLIENT_SECRET`
+- `OPENAI_API_KEY`
 
 ## Known alpha boundaries
 - Production go-live hardening is out of scope for this alpha template.
