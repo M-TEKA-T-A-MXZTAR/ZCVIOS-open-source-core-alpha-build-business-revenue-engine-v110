@@ -1,8 +1,5 @@
 "use client";
-
-export const dynamic = "force-dynamic";
-
-import * as React from "react";
+import { useEffect } from "react";
 
 export default function GlobalError({
   error,
@@ -11,6 +8,11 @@ export default function GlobalError({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  useEffect(() => {
+    // eslint-disable-next-line no-console
+    console.error(error);
+  }, [error]);
+
   return (
     <html>
       <body style={{ padding: 24, fontFamily: "system-ui, sans-serif" }}>
@@ -19,9 +21,7 @@ export default function GlobalError({
           A global error occurred. Try again, or refresh the page.
         </p>
 
-        <pre style={{ whiteSpace: "pre-wrap", opacity: 0.7 }}>
-          {error?.message}
-        </pre>
+        <pre style={{ whiteSpace: "pre-wrap", opacity: 0.7 }}>{error?.message}</pre>
 
         <button
           onClick={() => reset()}
