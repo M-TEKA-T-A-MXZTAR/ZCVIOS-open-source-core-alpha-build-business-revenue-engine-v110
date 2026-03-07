@@ -1,14 +1,12 @@
-"use client";
-
-export const dynamic = "force-dynamic";
+'use client'
 
 export default function GlobalError() {
   return (
     <html>
       <body>
-        <h1>Application error</h1>
-        <p>Something went wrong.</p>
+        <h1>Application Error</h1>
+        <p>An unexpected error occurred.</p>
       </body>
     </html>
-  );
+  )
 }
