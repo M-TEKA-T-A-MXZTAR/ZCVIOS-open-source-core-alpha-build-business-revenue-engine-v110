@@ -1,20 +1,21 @@
-"use client";
+'use client'
 
 export default function GlobalError({
   error,
-  reset
+  reset,
 }: {
-  error: Error & { digest?: string }
+  error: Error
   reset: () => void
 }) {
   return (
     <html>
       <body>
-        <h2>Something went wrong</h2>
+        <h1>Application Error</h1>
+        <p>An unexpected error occurred.</p>
         <button onClick={() => reset()}>
           Try again
         </button>
       </body>
     </html>
-  );
+  )
 }
