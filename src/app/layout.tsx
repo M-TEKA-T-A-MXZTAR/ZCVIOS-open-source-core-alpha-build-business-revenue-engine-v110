@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Chivo, Inter } from "next/font/google";
 import "./globals.css";
+import { Providers } from "@/components/providers";
 
 const chivo = Chivo({
   variable: "--font-chivo",
@@ -27,7 +28,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${chivo.variable} ${inter.variable} antialiased`}>
-        {children}
+        <Providers>{children}</Providers>
       </body>
     </html>
   );
