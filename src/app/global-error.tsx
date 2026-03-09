@@ -1,36 +1,17 @@
 "use client";
 
-import * as React from "react";
-
 export default function GlobalError({
   error,
-  reset,
+  reset
 }: {
-  error: Error & { digest?: string };
-  reset: () => void;
+  error: Error & { digest?: string }
+  reset: () => void
 }) {
   return (
     <html>
-      <body style={{ padding: 24, fontFamily: "system-ui, sans-serif" }}>
-        <h1>Something went wrong</h1>
-        <p style={{ opacity: 0.8 }}>
-          A global error occurred. Try again, or refresh the page.
-        </p>
-
-        <pre style={{ whiteSpace: "pre-wrap", opacity: 0.7 }}>
-          {error?.message}
-        </pre>
-
-        <button
-          onClick={() => reset()}
-          style={{
-            marginTop: 16,
-            padding: "10px 14px",
-            borderRadius: 8,
-            border: "1px solid #888",
-            cursor: "pointer",
-          }}
-        >
+      <body>
+        <h2>Something went wrong</h2>
+        <button onClick={() => reset()}>
           Try again
         </button>
       </body>
