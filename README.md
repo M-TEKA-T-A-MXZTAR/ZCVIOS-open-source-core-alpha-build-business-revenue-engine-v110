@@ -1,60 +1,71 @@
-# ZC-VIOS Core v1.1.0-alpha
+# ZC-VIOS Core v1.1.1-alpha
 
 > **ALPHA DISCLAIMER**
 > This repository is an alpha template focused on core engine stability and reproducible local development.
 
-## Architecture (aligned)
+## Architecture
 
-- **Framework:** Next.js (App Router) full-stack (API routes in `src/app/rpc/*`)
-- **Database:** SQLite
-- **ORM:** Prisma (`/prisma/schema.prisma`)
-- **Auth:** NextAuth (email/password active, Google OAuth optional placeholder)
+- **Framework:** Next.js 16 (App Router) full-stack (API routes in `src/app/rpc/*`)
+- **Database:** SQLite (Prisma ORM)
+- **Auth:** NextAuth (email/password)
+- **Route structure:** Authenticated pages under `(app)` route group with scoped SessionProvider
 
-## Repository structure (minimal alpha)
+### App structure
 
 ```txt
-/prisma
-/src
-/public
-/tests
-.env.example
-README.md
-CHANGELOG.md
-RELEASE_NOTES_v1.1.0-alpha.md
-package.json
+src/app/
+├── layout.tsx              # Minimal root layout (no providers)
+├── global-error.tsx        # Minimal error boundary
+├── page.tsx                # Landing page
+├── login/                  # Public auth pages
+├── register/
+└── (app)/                  # Authenticated route group
+    ├── layout.tsx          # SessionProvider wrapper
+    ├── dashboard/
+    ├── settings/
+    ├── logs/
+    ├── revenue/
+    ├── onboarding/
+    └── reports/
+        ├── weekly/
+        └── monthly/
 ```
 
-## Local setup (fresh clone)
+## Local setup
 
-1) Install dependencies
+1. Install dependencies
 ```bash
 npm install
 ```
 
-2) Create local environment file
+2. Create local environment file
 ```bash
 cp .env.example .env.local
 ```
-Set a value for `NEXTAUTH_SECRET` in `.env.local` before running auth flows.
 
-3) Run Prisma migration
+3. Generate Prisma client
 ```bash
-npx prisma migrate dev
+npx prisma generate
 ```
 
-4) Seed demo data
+4. Run database migrations
+```bash
+npx prisma migrate deploy
+```
+
+5. Seed demo data
 ```bash
 npm run seed
 ```
 
-5) Start app
+6. Start development server
 ```bash
 npm run dev
 ```
 
 Open: `http://localhost:3000`
 
-Demo account:
+**Demo account:**
 - Email: `demo@zcvios.local`
 - Password: `DemoPass123!`
 
@@ -63,45 +74,29 @@ Demo account:
 Defined in `.env.example`:
 
 ```env
-NODE_ENV=development
 DATABASE_URL=file:./dev.db
-NEXTAUTH_SECRET=ci-nextauth-secret-zcvios
+NEXTAUTH_SECRET=your-secret-here
 NEXTAUTH_URL=http://localhost:3000
-REACT_APP_BACKEND_URL=http://localhost:3000
 ```
 
-Notes:
-- **Deterministic mode works without OpenAI key.**
-- **Google OAuth is optional** (placeholder only in alpha). Add `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` in `.env.local` if you want to enable it.
-- **OpenAI is optional** (BYO key per user in Settings).
+**Notes:**
+- Deterministic mode works without OpenAI key
+- OpenAI is optional (BYO key per user in Settings)
 
-## Validation targets (alpha)
+## Verification
 
-- Email/password signup + login works.
-- Weekly revenue entry triggers strategy selection (single weekly lever).
-- Daily mission renders and work sessions can be logged.
-- Weekly + monthly reports render with charts.
-- Privacy controls work: export data + delete account/data.
-
-## Tests
-
-Keep the app running (`npm run dev`) in one terminal, then run tests in another.
-
-Full regression:
 ```bash
-npm run test
+npm run lint      # ESLint
+npm run build     # Production build
+npm run test      # Integration tests (requires app running)
 ```
 
-Privacy-only path:
-```bash
-npm run test:privacy
-```
+## CI workflow
 
-## Non-goals for this alpha pass
+The GitHub Actions workflow runs two jobs:
 
-- Production deployment steps
-- Custom domain configuration
-- Forced OAuth go-live integration
+1. **Build & Verify** - Install, migrate, seed, lint, build
+2. **Integration Tests** - Python pytest suite against running app (requires Build to pass)
 
 ## License
 
