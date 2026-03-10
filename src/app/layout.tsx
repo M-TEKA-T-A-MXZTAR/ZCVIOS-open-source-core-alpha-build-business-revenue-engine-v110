@@ -28,7 +28,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${chivo.variable} ${inter.variable} antialiased`}>
-        <Providers>{children}</Providers>
+        {children}
       </body>
     </html>
   );
