@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Chivo, Inter } from "next/font/google";
 import "./globals.css";
-import { Providers } from "@/components/providers";
 
 const chivo = Chivo({
   variable: "--font-chivo",
