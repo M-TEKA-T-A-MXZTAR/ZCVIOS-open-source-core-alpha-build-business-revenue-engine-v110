@@ -1,5 +1,9 @@
 # ZC-VIOS Core v1.1.1-alpha
 
+**Creator Revenue Operating System**
+
+Open-source workflow and revenue intelligence engine designed to help solo creators structure design-to-commerce operations.
+
 > **ALPHA DISCLAIMER**
 > This repository is an alpha template focused on core engine stability and reproducible local development.
 
