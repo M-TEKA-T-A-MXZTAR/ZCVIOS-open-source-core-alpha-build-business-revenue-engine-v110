@@ -103,6 +103,7 @@ The GitHub Actions workflow runs two jobs:
 - [System Overview](docs/SYSTEM_OVERVIEW.md) - Architecture, components, and engine concepts
 - [ZC-VIOS Lore](docs/ZCVIOS_LORE.md) - Vision and philosophy behind the system
 - [ZCcode Language](docs/ZCCODE_LANGUAGE.md) - Structured prompting language for system design
+- [Roadmap](docs/ROADMAP.md) - Current status and future direction
 - [Support](docs/SUPPORT.md) - How to support development
 
 ## License

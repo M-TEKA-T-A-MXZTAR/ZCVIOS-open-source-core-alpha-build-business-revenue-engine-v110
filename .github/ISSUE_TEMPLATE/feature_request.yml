@@ -1,0 +1,55 @@
+name: Feature Request
+description: Suggest an improvement or new feature
+title: "[Feature]: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for suggesting an improvement. Please describe your idea below.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What problem does this feature solve?
+      placeholder: Describe the issue or gap you're experiencing
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed Solution
+      description: How would you like this to work?
+      placeholder: Describe your ideal solution
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives Considered
+      description: Have you considered other approaches?
+      placeholder: Describe any alternative solutions you've thought about
+    validations:
+      required: false
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional Context
+      description: Any other information that might help
+      placeholder: Screenshots, examples, links, etc.
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: philosophy
+    attributes:
+      label: Alignment Check
+      description: Does this request align with ZC-VIOS principles?
+      options:
+        - label: This feature supports the one-lever-per-week philosophy
+        - label: This feature does not require mandatory external dependencies
+        - label: This feature preserves user privacy controls
