@@ -98,6 +98,13 @@ The GitHub Actions workflow runs two jobs:
 1. **Build & Verify** - Install, migrate, seed, lint, build
 2. **Integration Tests** - Python pytest suite against running app (requires Build to pass)
 
+## Documentation
+
+- [System Overview](docs/SYSTEM_OVERVIEW.md) - Architecture, components, and engine concepts
+- [ZC-VIOS Lore](docs/ZCVIOS_LORE.md) - Vision and philosophy behind the system
+- [ZCcode Language](docs/ZCCODE_LANGUAGE.md) - Structured prompting language for system design
+- [Support](docs/SUPPORT.md) - How to support development
+
 ## License
 
 MIT
