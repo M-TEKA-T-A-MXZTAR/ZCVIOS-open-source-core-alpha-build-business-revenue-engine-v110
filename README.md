@@ -107,6 +107,7 @@ The GitHub Actions workflow runs two jobs:
 - [ZCcode Language](docs/ZCCODE_LANGUAGE.md) - Structured prompting language for system design
 - [Roadmap](docs/ROADMAP.md) - Current status and future direction
 - [v1.2.0 Execution Plan](docs/V1_2_0_EXECUTION_PLAN.md) - Next milestone deliverables
+- [v1.2.0 Work Queue](docs/V1_2_0_WORK_QUEUE.md) - Implementation planning
 - [Support](docs/SUPPORT.md) - How to support development
 
 ## License
