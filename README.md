@@ -64,17 +64,16 @@ Defined in `.env.example`:
 
 ```env
 NODE_ENV=development
-DATABASE_URL="file:./dev.db"
-NEXTAUTH_SECRET=
+DATABASE_URL=file:./dev.db
+NEXTAUTH_SECRET=ci-nextauth-secret-zcvios
 NEXTAUTH_URL=http://localhost:3000
-GOOGLE_CLIENT_ID=
-GOOGLE_CLIENT_SECRET=
-OPENAI_API_KEY=
+REACT_APP_BACKEND_URL=http://localhost:3000
 ```
 
 Notes:
 - **Deterministic mode works without OpenAI key.**
-- **Google OAuth is optional** (placeholder only in alpha).
+- **Google OAuth is optional** (placeholder only in alpha). Add `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` in `.env.local` if you want to enable it.
+- **OpenAI is optional** (BYO key per user in Settings).
 
 ## Validation targets (alpha)
 
