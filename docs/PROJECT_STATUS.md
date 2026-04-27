@@ -1,77 +1,127 @@
-# ZC-VIOS Project Status
+# Project Status
 
-## Current Release
+## Current Status
+
+ZC-VIOS Core is an early alpha project focused on creator workflow planning, revenue measurement, and daily execution support.
+
+The current public direction is:
+
+> A privacy-first planning and workflow measurement workspace for solo creators and small business owners.
+
+The project is intended to help users organize work, track revenue-related signals, and make clearer decisions about where to focus next.
+
+---
+
+## Current Version
 
 **Version:** v1.1.1-alpha  
-**Date:** March 10, 2026  
-**Purpose:** Stabilization of CI pipeline, build system, and repository architecture
+**Status:** Early alpha foundation  
+**Primary focus:** Local-first planning, deterministic strategy logic, workflow measurement, and documentation clarity
 
-This release focused on resolving Next.js prerender failures, restructuring the CI workflow into separate build and test jobs, and organizing authenticated routes under a dedicated route group with scoped SessionProvider.
+---
 
-## Current Capabilities
+## What Is Currently In Scope
 
-What currently works:
+The current project scope includes:
 
-- Stable Next.js 16 application with App Router architecture
-- Email/password authentication via NextAuth
-- Weekly lever selection (deterministic rules, optional AI enhancement)
-- Daily mission generation based on active lever
-- Work session logging with category tracking
-- Weekly and monthly EHR (Effective Hourly Rate) reports
-- Privacy controls: data export and account deletion
-- PDF export for weekly reviews
-- Verified CI pipeline with separate build and integration test jobs
-- Comprehensive documentation system
+- user authentication,
+- local development workflow,
+- work session logging,
+- weekly revenue entry,
+- Effective Hourly Rate reporting,
+- deterministic weekly lever recommendations,
+- daily mission generation,
+- user settings,
+- data export and deletion concepts,
+- and documentation for future development.
 
-## Repository Health
+---
 
-| Item | Status |
-|------|--------|
-| CI passing | ✅ |
-| main branch stable | ✅ |
-| Documentation aligned with code | ✅ |
-| Release tagged | ✅ v1.1.1-alpha-ZCVIOS |
-| Contributor guidelines present | ✅ |
-| Security policy present | ✅ |
-| Code of conduct present | ✅ |
-| Issue templates configured | ✅ |
+## What Is Not Currently In Scope
 
-## Next Milestone
+The current project is not intended to provide:
 
-**v1.2.0-alpha — Creator Engine Foundations**
+- guaranteed financial outcomes,
+- private account control,
+- credential collection,
+- payment processing,
+- automated platform actions,
+- hidden account access,
+- unauthorized scraping,
+- or enterprise-level analytics.
 
-Planned work items:
+Future features should remain optional, user-authorized, and clearly documented.
 
-1. **EHR Calculation Refinement** — Handle edge cases, separate lever-specific vs total EHR
-2. **Lever History Tracking** — Persist lever selections with outcomes over time
-3. **Mission Completion Tracking** — Allow marking missions complete, track completion rate
-4. **ZCcode Spec Files** — Machine-readable specifications for core components
-5. **Weekly Review Improvements** — Week-over-week comparison, execution consistency score
+---
 
-See [v1.2.0 Work Queue](V1_2_0_WORK_QUEUE.md) for implementation details.
+## Privacy and Trust Position
 
-## Long-Term Vision
+ZC-VIOS should not request or store:
 
-ZC-VIOS is a decision support system for solo creators and operators. The core purpose is to help users increase their effective revenue-per-hour by:
+- passwords,
+- payment credentials,
+- recovery codes,
+- private platform tokens,
+- private messages,
+- or restricted account data.
 
-- Focusing on one high-leverage activity per week
-- Executing against a clear daily mission
-- Tracking outcomes with EHR as the north star metric
-- Making data-informed decisions about where to invest limited time
+The system should remain user-controlled. Any business information used by the system should come from records the user enters, files the user provides, or public information the user is authorized to review.
 
-The system provides structure and clarity, not comprehensive business operations. It answers the question: "What should I focus on?" — not "How do I run my entire business?"
+---
 
-## Support
+## Alpha Limitations
 
-If you find this project useful, you can support continued development:
+Because the project is in alpha, users and contributors should expect:
 
-**Buy Me a Coffee**  
-[https://www.buymeacoffee.com/mxztar](https://www.buymeacoffee.com/mxztar)
+- incomplete features,
+- changing interfaces,
+- limited test coverage in some areas,
+- documentation that may evolve,
+- and possible bugs during local development.
 
-## Links
+Alpha status means the project is still being shaped. It should not be treated as a finished commercial product.
 
-- [README](../README.md)
-- [System Overview](SYSTEM_OVERVIEW.md)
-- [Product Thesis](PRODUCT_THESIS.md)
-- [Roadmap](ROADMAP.md)
-- [Contributing](../CONTRIBUTING.md)
+---
+
+## Development Priorities
+
+Current development priorities are:
+
+1. Keep the local-first core stable.
+2. Improve reliability of weekly lever recommendations.
+3. Improve clarity of daily mission generation.
+4. Strengthen reporting and export workflows.
+5. Keep documentation aligned with actual implementation.
+6. Maintain privacy-first and user-controlled design principles.
+7. Avoid overbroad claims before features are implemented and tested.
+
+---
+
+## Recommended Contributor Focus
+
+Contributors can help by:
+
+- improving documentation,
+- reviewing privacy and security assumptions,
+- strengthening tests,
+- improving local setup reliability,
+- simplifying user flows,
+- improving accessibility,
+- and suggesting small, practical features aligned with the project scope.
+
+---
+
+## Current Trust Cleanup
+
+The repository documentation is being updated to use clearer public language.
+
+The goal is to describe ZC-VIOS accurately as a creator planning and workflow measurement workspace, avoiding wording that could imply:
+
+- credential collection,
+- private account access,
+- hidden automation,
+- guaranteed revenue,
+- system-level device control,
+- or platform rule bypassing.
+
+No application code changes are required for this documentation cleanup unless a later audit identifies a code-level issue.
