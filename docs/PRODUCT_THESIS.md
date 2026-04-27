@@ -2,37 +2,43 @@
 
 ## Core User
 
-**Solo operators and small business owners** who:
-- Trade time for money (services, consulting, freelance, small product sales)
+ZC-VIOS is designed for **solo operators and small business owners** who:
+
+- Trade time for money through services, consulting, freelance work, or small product sales
 - Work 30-60 hours per week
-- Earn $50K-$300K annually
+- Earn revenue through their own direct effort
 - Have no dedicated operations team
 - Make most business decisions themselves
 
-Not enterprise teams. Not venture-backed startups. Not hobbyists.
+The system is not designed as an enterprise management platform, venture-backed startup suite, or general hobby productivity app.
 
 ## Core Problem
 
 Solo operators face a consistent failure mode:
 
 1. They work hard but scatter effort across multiple priorities
-2. They track activity (hours worked, tasks completed) instead of outcomes (revenue per hour)
+2. They track activity, such as hours worked and tasks completed, instead of outcomes, such as revenue per hour
 3. They lack a systematic way to decide where to focus
 4. They optimize for busyness instead of leverage
 
-The result: plateaued income despite increasing hours worked. The business becomes a job with worse benefits.
+The result is often plateaued income despite increasing hours worked. The business can become harder to manage without becoming more profitable or more sustainable.
 
-## Core Promise
+## Core Purpose
 
-ZC-VIOS answers one question each week:
+ZC-VIOS helps the user answer one practical question each week:
 
-> "Given my current situation, what is the single highest-leverage action I should focus on?"
+> “Given my current situation, what is the single highest-value action I should focus on?”
 
-The system:
-- Selects one lever per week based on data (EHR trend, execution consistency, business signals)
-- Generates one daily mission aligned to that lever
-- Tracks revenue and hours to calculate Effective Hourly Rate
-- Reports progress against the user's own historical baseline
+The system supports this by helping the user:
+
+- Review Effective Hourly Rate trends
+- Compare execution consistency against available work time
+- Consider user-provided business signals
+- Receive a rule-based weekly lever recommendation
+- Generate one daily mission aligned to that lever
+- Track revenue and hours against the user’s own historical baseline
+
+ZC-VIOS is a decision-support tool. It does not guarantee income, replace human judgment, or make business decisions on behalf of the user.
 
 ## Measurable Outcomes
 
@@ -40,27 +46,40 @@ Success means users can answer:
 
 | Question | ZC-VIOS Provides |
 |----------|------------------|
-| What should I focus on this week? | Weekly lever selection |
-| What should I do today? | Daily mission |
-| Is my business improving? | EHR trend (4-week rolling) |
-| Am I working efficiently? | Hours logged vs revenue generated |
+| What should I focus on this week? | Weekly lever recommendation |
+| What should I do today? | Daily mission suggestion |
+| Is my business improving? | Effective Hourly Rate trend |
+| Am I working efficiently? | Hours logged compared with revenue generated |
 | Where did my time go? | Work log by category |
 
 ## Non-Goals
 
 ZC-VIOS is **not**:
 
-- A task manager (no subtasks, no due dates, no priority matrices)
-- A project management tool (no Gantt charts, no resource allocation)
-- A time tracker for billing (no invoicing, no client management)
-- A business analytics platform (no cohort analysis, no funnel visualization)
-- A coaching or accountability service (no human intervention)
-- A gamified productivity app (no points, streaks, badges, or shame mechanics)
+- A credential collection tool
+- A payment-processing system
+- A private account access tool
+- A task manager with subtasks, due dates, and priority matrices
+- A project management tool with Gantt charts or resource allocation
+- A time tracker for billing, invoicing, or client management
+- A full business analytics platform with cohort analysis or funnel visualization
+- A coaching or accountability service with human intervention
+- A gamified productivity app with points, streaks, badges, or shame mechanics
 
-The system provides **decision support for where to focus**, not comprehensive business operations.
+The system provides decision support for where to focus. It is not intended to control private accounts, bypass platform rules, or guarantee financial outcomes.
 
 ## Design Constraint
 
-Deterministic mode must always work without external API dependencies. Users who never configure OpenAI still get full functionality through rule-based lever selection and template-based missions.
+Deterministic mode must always work without external API dependencies.
 
-AI features are optional enhancements, not requirements.
+Users who never configure an external AI provider still get core functionality through rule-based lever recommendations and template-based missions.
+
+AI-assisted features are optional enhancements. They should remain user-configured, transparent, and non-essential to the core workflow.
+
+## Privacy and Responsible Use
+
+ZC-VIOS is intended to be a user-controlled planning and workflow measurement workspace.
+
+The system should not request passwords, payment credentials, recovery codes, private platform tokens, or restricted account data.
+
+Any review of business information should be based on data the user chooses to provide, records the user manually enters, or public information the user is authorized to review.
