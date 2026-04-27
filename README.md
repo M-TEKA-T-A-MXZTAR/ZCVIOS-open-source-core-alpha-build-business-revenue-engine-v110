@@ -1,11 +1,20 @@
 # ZC-VIOS Core v1.1.1-alpha
 
-**Creator Revenue Operating System**
+## Creator Workflow and Revenue Planning Workspace
 
-Open-source workflow and revenue intelligence engine designed to help solo creators structure design-to-commerce operations.
+Open-source planning and measurement workspace designed to help solo creators structure design-to-commerce operations.
 
-> **ALPHA DISCLAIMER**
-> This repository is an alpha template focused on core engine stability and reproducible local development.
+ZC-VIOS helps creators organize workflow data, review progress, estimate effective hourly return, and choose clearer next actions. It is intended for practical planning, local development, and creator-business decision support.
+
+> **Alpha disclaimer:** This repository is an alpha template focused on core engine stability, reproducible local development, and transparent documentation.
+
+## Privacy-first positioning
+
+ZC-VIOS is designed as a user-controlled planning tool.
+
+It does not collect passwords, payment credentials, recovery codes, private platform tokens, or private account data. Core functionality works locally with deterministic logic. External AI features are optional, user-configured, and not required for basic operation.
+
+Any public-page review or storefront analysis should be user-initiated and limited to information the user is authorized to provide or publicly visible information.
 
 ## Architecture
 
