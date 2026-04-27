@@ -1,8 +1,14 @@
 # v1.2.0-alpha Work Queue
 
-Implementation planning document for v1.2.0-alpha deliverables.
+## Purpose
+
+This document breaks the v1.2.0-alpha execution plan into practical implementation work items.
 
 **Source of truth:** [V1_2_0_EXECUTION_PLAN.md](V1_2_0_EXECUTION_PLAN.md)
+
+The work queue is focused on local-first planning, workflow tracking, EHR calculation clarity, and weekly review improvements.
+
+This work does not add credential collection, payment processing, hidden account access, or automated platform actions.
 
 ---
 
@@ -11,21 +17,24 @@ Implementation planning document for v1.2.0-alpha deliverables.
 | Order | Deliverable | Rationale |
 |-------|-------------|-----------|
 | 1 | **D3: EHR Calculation Refinement** | Foundation for accurate reporting |
-| 2 | **D1: Lever History Tracking** | Required by D5, provides data for insights |
-| 3 | **D2: Mission Completion Tracking** | Independent, improves daily loop |
-| 4 | **D4: ZCcode Spec Files** | Documentation, no code dependencies |
+| 2 | **D1: Lever History Tracking** | Required by D5, provides data for weekly review |
+| 3 | **D2: Mission Completion Tracking** | Independent, improves daily execution loop |
+| 4 | **D4: ZCcode Spec Files** | Documentation/specification work, no code dependencies |
 | 5 | **D5: Weekly Review Improvements** | Depends on D1 and D3 |
 
-### Maximum Leverage First
+---
 
-**Start with D3 (EHR Calculation Refinement).**
+## Maximum Leverage First
+
+Start with **D3: EHR Calculation Refinement**.
 
 Rationale:
-- EHR is the core metric of the system
-- Edge case bugs erode user trust
-- Clean calculations make all reports more reliable
-- No dependencies, can ship immediately
-- Small scope, high impact
+
+- EHR is the core measurement signal of the system
+- Edge case bugs reduce user trust
+- Clear calculations make reports more reliable
+- No dependencies are required
+- Small scope, high practical impact
 
 ---
 
@@ -33,60 +42,63 @@ Rationale:
 
 ### W1: EHR Calculation Refinement
 
-**Deliverable:** D3
-
-**Purpose:**  
-Eliminate edge case errors in EHR calculation and provide clearer distinctions between lever-specific and total EHR.
+**Deliverable:** D3  
+**Purpose:** Eliminate edge case errors in EHR calculation and provide clearer distinctions between lever-specific and total EHR.
 
 **Scope:**
-- Fix division-by-zero when no hours logged
-- Handle zero-revenue weeks gracefully
-- Separate lever EHR (LEVER category hours only) from total EHR (all hours)
-- Document calculation methodology in code
 
-**Acceptance Criteria:**
-- [ ] Zero-hour weeks display "No hours logged" instead of $0/h or NaN
-- [ ] Zero-revenue weeks display "No revenue recorded"
+- Fix division-by-zero handling when no hours are logged
+- Handle zero-revenue weeks clearly
+- Separate lever EHR, using `LEVER` category hours only, from total EHR, using all logged hours
+- Document calculation methodology in code comments
+
+**Acceptance criteria:**
+
+- [ ] Zero-hour weeks display “No hours logged” instead of `$0/h` or `NaN`
+- [ ] Zero-revenue weeks display “No revenue recorded”
 - [ ] Lever EHR calculation excludes non-LEVER category hours
 - [ ] Total EHR calculation includes all logged hours
-- [ ] Calculation logic documented in `src/lib/metrics.ts` comments
+- [ ] Calculation logic is documented in `src/lib/metrics.ts` comments
+- [ ] UI does not imply guaranteed or predicted income
 
 **Dependencies:** None
 
-**Implementation Notes:**
+**Implementation notes:**
+
 - Primary file: `src/lib/metrics.ts`
 - Check `calcEhr` function for division handling
 - Check `weeklyHours` function for category filtering
-- Update report components to use correct EHR variant
+- Update report components to use the correct EHR variant
 - Add JSDoc comments explaining formulas
 
-**Estimated scope:** Small (1-2 files, <100 lines changed)
+**Estimated scope:** Small, likely 1–2 files
 
 ---
 
 ### W2: Lever History Tracking
 
-**Deliverable:** D1
-
-**Purpose:**  
-Persist lever selections over time to enable trend analysis and informed strategy decisions.
+**Deliverable:** D1  
+**Purpose:** Persist lever selections over time to support clearer weekly review and future recommendations.
 
 **Scope:**
+
 - Store lever selection with week metadata
 - Capture EHR at selection time and week end
 - Display history in weekly report
-- Include in data export
+- Include lever history in data export where applicable
 
-**Acceptance Criteria:**
-- [ ] `WeeklyPlan` or new model stores: lever, weekStart, ehrAtSelection, ehrAtEnd
-- [ ] Selection timestamp recorded when lever is set
+**Acceptance criteria:**
+
+- [ ] `WeeklyPlan` or new model stores `lever`, `weekStart`, `ehrAtSelection`, and `ehrAtEnd`
+- [ ] Selection timestamp is recorded when lever is set
 - [ ] Weekly report shows last 4 weeks of lever history
 - [ ] Data export includes lever history
 - [ ] Migration does not break existing data
 
-**Dependencies:** None (but benefits from D3 being complete first)
+**Dependencies:** None, but benefits from W1 being complete first
 
-**Implementation Notes:**
+**Implementation notes:**
+
 - Option A: Add fields to existing `WeeklyPlan` model
 - Option B: Create separate `LeverHistory` model with relation
 - Update `src/app/rpc/lever-override/route.ts` to record history
@@ -94,111 +106,119 @@ Persist lever selections over time to enable trend analysis and informed strateg
 - Update data export to include new fields
 - Create Prisma migration
 
-**Estimated scope:** Medium (schema change, 3-4 files, migration)
+**Estimated scope:** Medium
 
 ---
 
 ### W3: Mission Completion Tracking
 
-**Deliverable:** D2
-
-**Purpose:**  
-Allow users to mark daily missions complete and track completion rate.
+**Deliverable:** D2  
+**Purpose:** Allow users to mark daily missions complete and track completion rate.
 
 **Scope:**
+
 - Add completion timestamp to mission model
 - Add UI control to mark mission complete
 - Show completion rate in weekly report
 
-**Acceptance Criteria:**
+**Acceptance criteria:**
+
 - [ ] `DailyMission` model has `completedAt: DateTime?` field
-- [ ] Dashboard shows "Mark Complete" button when mission active
-- [ ] Clicking button sets `completedAt` to current timestamp
-- [ ] Button changes to "Completed" state after marking
-- [ ] Weekly report shows "X/7 missions completed"
-- [ ] Completion resets for new day's mission
+- [ ] Dashboard shows “Mark Complete” button when a mission is active
+- [ ] Clicking the button sets `completedAt` to the current timestamp
+- [ ] Button changes to “Completed” state after marking
+- [ ] Weekly report shows “X/7 missions completed”
+- [ ] Completion state is scoped to the correct mission/day
 
 **Dependencies:** None
 
-**Implementation Notes:**
+**Implementation notes:**
+
 - Add field to `DailyMission` in `prisma/schema.prisma`
 - Create migration
 - Add API endpoint or modify existing `/rpc/mission` for completion
 - Update dashboard component with completion UI
 - Update weekly report to calculate completion rate
-- Consider: should completion be reversible?
+- Decide whether completion should be reversible
 
-**Estimated scope:** Medium (schema change, API update, UI change)
+**Estimated scope:** Medium
 
 ---
 
 ### W4: ZCcode Spec Files
 
-**Deliverable:** D4
+**Deliverable:** D4  
+**Purpose:** Create structured specification files for core system components using ZCcode format.
 
-**Purpose:**  
-Create machine-readable specifications for core system components using ZCcode format.
+ZCcode is used as a communication and specification format. It is not executable runtime code.
 
 **Scope:**
+
 - Create `zccode/` directory
 - Write spec for mission generation
 - Write spec for strategy selection
 - Write spec for EHR calculation
 - Update ZCcode language documentation
 
-**Acceptance Criteria:**
+**Acceptance criteria:**
+
 - [ ] `zccode/mission.zc` exists with mission generation interface
 - [ ] `zccode/strategy.zc` exists with strategy selection interface
 - [ ] `zccode/ehr.zc` exists with EHR calculation interface
 - [ ] Files follow documented ZCcode format
-- [ ] `docs/ZCCODE_LANGUAGE.md` updated with spec file examples
+- [ ] `docs/ZCCODE_LANGUAGE.md` is updated with spec file examples
+- [ ] Specs are clearly labelled as descriptive, not executable
 
 **Dependencies:** None
 
-**Implementation Notes:**
+**Implementation notes:**
+
 - Review `docs/ZCCODE_LANGUAGE.md` for format reference
-- Extract interface from `src/lib/ai.ts` for mission/strategy specs
+- Extract interface from `src/lib/ai.ts` for mission and strategy specs
 - Extract interface from `src/lib/metrics.ts` for EHR spec
 - Keep specs descriptive, not executable
-- Consider: JSON-like structure vs custom syntax
+- Prefer clarity over clever syntax
 
-**Estimated scope:** Small (documentation only, no code changes)
+**Estimated scope:** Small, documentation/specification focused
 
 ---
 
 ### W5: Weekly Review Improvements
 
-**Deliverable:** D5
-
-**Purpose:**  
-Enhance weekly review with actionable insights based on historical data.
+**Deliverable:** D5  
+**Purpose:** Enhance weekly review with practical insights based on historical data.
 
 **Scope:**
+
 - Add week-over-week EHR comparison
 - Add execution consistency score
-- Add suggested next lever based on history
-- Update PDF export with new fields
+- Add suggested next lever based on user history and simple rules
+- Update PDF export with new fields where applicable
 
-**Acceptance Criteria:**
-- [ ] Weekly review shows "EHR: $X/h (+/-Y% vs last week)"
-- [ ] Execution consistency shows "Z% of target hours logged"
-- [ ] Suggested lever shown based on simple rules (not AI)
-- [ ] PDF export includes all new fields
-- [ ] Graceful handling when insufficient history exists
+**Acceptance criteria:**
 
-**Dependencies:** 
-- W1 (EHR Calculation Refinement) - for accurate comparison
-- W2 (Lever History Tracking) - for suggestion logic
+- [ ] Weekly review shows EHR comparison against the previous week
+- [ ] Execution consistency shows percentage of target hours logged
+- [ ] Suggested lever is shown as decision support, not a command
+- [ ] PDF export includes all new fields where applicable
+- [ ] Insufficient-history cases are handled clearly
+- [ ] Recommendations do not imply guaranteed financial outcomes
 
-**Implementation Notes:**
+**Dependencies:**
+
+- W1: EHR Calculation Refinement
+- W2: Lever History Tracking
+
+**Implementation notes:**
+
 - Update `/rpc/reports/weekly` to include comparison data
-- Calculate consistency as: (actual hours / target hours) * 100
-- Suggestion logic: if EHR declining and lever unchanged for 3+ weeks, suggest change
+- Calculate consistency as `(actual hours / target hours) * 100`
+- Suggested lever logic should be explainable and user-reviewable
 - Update `src/app/(app)/reports/weekly/page.tsx` component
-- Update PDF generation in weekly review route
-- Handle edge cases: first week (no comparison), no target set
+- Update PDF generation in weekly review route if applicable
+- Handle edge cases: first week, no comparison, no target set
 
-**Estimated scope:** Medium-Large (API update, UI changes, PDF update)
+**Estimated scope:** Medium to large
 
 ---
 
@@ -210,17 +230,19 @@ Enhance weekly review with actionable insights based on historical data.
 | W2: Lever History | Not Started | - | - | After W1 |
 | W3: Mission Completion | Not Started | - | - | Independent |
 | W4: ZCcode Specs | Not Started | - | - | Independent |
-| W5: Weekly Review | Not Started | - | - | After W1, W2 |
+| W5: Weekly Review | Not Started | - | - | After W1 and W2 |
 
 ---
 
 ## Definition of Done
 
 Each work item is complete when:
-1. Code changes implemented
-2. Tests pass (existing + any new tests)
+
+1. Code changes are implemented
+2. Tests pass
 3. `npm run lint` passes
 4. `npm run build` passes
-5. Manual verification confirms feature works
-6. CHANGELOG updated if user-facing
-7. PR merged to main
+5. Manual verification confirms the feature works
+6. Documentation is updated if user-facing behavior changes
+7. CHANGELOG is updated if required
+8. PR is reviewed and merged to main
