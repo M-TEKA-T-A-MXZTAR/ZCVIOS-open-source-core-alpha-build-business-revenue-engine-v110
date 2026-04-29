@@ -5,10 +5,20 @@ import { requireSession } from "@/lib/session";
 import { startOfDay } from "@/lib/time";
 import { unauthorized } from "@/lib/http";
 
-const schema = z.object({
-  mode: z.enum(["1week", "2weeks", "custom", "resume"]),
-  customDate: z.string().date().optional(),
-});
+const schema = z
+  .object({
+    mode: z.enum(["1week", "2weeks", "custom", "resume"]),
+    customDate: z.string().date().optional(),
+  })
+  .refine(
+    (data) => {
+      if (data.mode !== "custom" || !data.customDate) return true;
+      const maxDate = new Date();
+      maxDate.setFullYear(maxDate.getFullYear() + 1);
+      return new Date(data.customDate).getTime() <= maxDate.getTime();
+    },
+    { message: "Pause end date cannot exceed one year from today", path: ["customDate"] },
+  );
 
 export async function GET() {
   const session = await requireSession();
@@ -55,11 +65,6 @@ export async function POST(req: Request) {
         return NextResponse.json({ error: "Custom date required" }, { status: 400 });
       }
       endDate = startOfDay(new Date(input.customDate));
-      const maxDate = new Date(now);
-      maxDate.setFullYear(maxDate.getFullYear() + 1);
-      if (endDate.getTime() > maxDate.getTime()) {
-        return NextResponse.json({ error: "Pause end date cannot exceed one year from today" }, { status: 400 });
-      }
     }
 
     await prisma.pauseWindow.updateMany({
