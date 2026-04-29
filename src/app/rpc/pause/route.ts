@@ -5,10 +5,20 @@ import { requireSession } from "@/lib/session";
 import { startOfDay } from "@/lib/time";
 import { unauthorized } from "@/lib/http";
 
-const schema = z.object({
-  mode: z.enum(["1week", "2weeks", "custom", "resume"]),
-  customDate: z.string().optional(),
-});
+const schema = z
+  .object({
+    mode: z.enum(["1week", "2weeks", "custom", "resume"]),
+    customDate: z.string().date().optional(),
+  })
+  .refine(
+    (data) => {
+      if (data.mode !== "custom" || !data.customDate) return true;
+      const maxDate = new Date();
+      maxDate.setFullYear(maxDate.getFullYear() + 1);
+      return new Date(data.customDate).getTime() <= maxDate.getTime();
+    },
+    { message: "Pause end date cannot exceed one year from today", path: ["customDate"] },
+  );
 
 export async function GET() {
   const session = await requireSession();

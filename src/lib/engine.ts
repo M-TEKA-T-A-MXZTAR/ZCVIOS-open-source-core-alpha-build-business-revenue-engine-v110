@@ -272,31 +272,32 @@ export const buildWeeklyReport = async (userId: string) => {
   const historyStart = new Date(weekStart);
   historyStart.setDate(historyStart.getDate() - 21);
 
-  const revenues = await prisma.weeklyRevenue.findMany({
-    where: {
-      userId,
-      weekStart: {
-        gte: historyStart,
-        lte: weekStart,
+  const [revenues, logs, strategy, user] = await Promise.all([
+    prisma.weeklyRevenue.findMany({
+      where: {
+        userId,
+        weekStart: {
+          gte: historyStart,
+          lte: weekStart,
+        },
       },
-    },
-    orderBy: { weekStart: "asc" },
-  });
-
-  const logs = await prisma.workLogSession.findMany({
-    where: {
-      userId,
-      date: {
-        gte: historyStart,
-        lte: endOfWeekMonday(weekStart),
+      orderBy: { weekStart: "asc" },
+    }),
+    prisma.workLogSession.findMany({
+      where: {
+        userId,
+        date: {
+          gte: historyStart,
+          lte: endOfWeekMonday(weekStart),
+        },
       },
-    },
-    orderBy: { date: "asc" },
-  });
-
-  const strategy = await prisma.weeklyPlan.findUnique({
-    where: { userId_weekStart: { userId, weekStart } },
-  });
+      orderBy: { date: "asc" },
+    }),
+    prisma.weeklyPlan.findUnique({
+      where: { userId_weekStart: { userId, weekStart } },
+    }),
+    prisma.user.findUnique({ where: { id: userId }, select: { fullLoggingEnabled: true } }),
+  ]);
 
   const thisWeekRevenue = revenues.find((item) => item.weekStart.getTime() === weekStart.getTime()) ?? null;
   const thisWeekLogs = logs.filter(
@@ -334,7 +335,7 @@ export const buildWeeklyReport = async (userId: string) => {
     },
     leverEhr,
     totalEhr,
-    fullLoggingEnabled: (await prisma.user.findUnique({ where: { id: userId } }))?.fullLoggingEnabled ?? false,
+    fullLoggingEnabled: user?.fullLoggingEnabled ?? false,
     slope,
     targetRange,
     momentum,

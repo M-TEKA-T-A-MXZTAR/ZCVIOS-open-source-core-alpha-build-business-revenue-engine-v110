@@ -7,7 +7,7 @@ import { startOfDay } from "@/lib/time";
 import { unauthorized } from "@/lib/http";
 
 const schema = z.object({
-  date: z.string(),
+  date: z.string().date(),
   minutes: z.number().min(1).max(720),
   category: z.nativeEnum(LogCategory),
   completed: z.boolean(),
