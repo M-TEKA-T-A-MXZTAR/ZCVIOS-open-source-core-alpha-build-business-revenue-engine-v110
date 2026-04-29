@@ -8,14 +8,14 @@ import { startOfWeekMonday } from "@/lib/time";
 import { unauthorized } from "@/lib/http";
 
 const schema = z.object({
-  revenue: z.number().min(0),
+  revenue: z.number().min(0).max(10_000_000),
   note: z.string().max(240).optional(),
   trafficSessions: z.number().min(0).max(100000).optional(),
   leadsGenerated: z.number().min(0).max(100000).optional(),
   closedSales: z.number().min(0).max(100000).optional(),
   churnedCustomers: z.number().min(0).max(100000).optional(),
   grossMarginPct: z.number().min(0).max(100).optional(),
-  weekStart: z.string().optional(),
+  weekStart: z.string().date().optional(),
 });
 
 export async function GET() {

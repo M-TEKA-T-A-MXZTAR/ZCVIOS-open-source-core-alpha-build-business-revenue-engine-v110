@@ -7,7 +7,7 @@ import { unauthorized } from "@/lib/http";
 
 const schema = z.object({
   mode: z.enum(["1week", "2weeks", "custom", "resume"]),
-  customDate: z.string().optional(),
+  customDate: z.string().date().optional(),
 });
 
 export async function GET() {
@@ -55,6 +55,11 @@ export async function POST(req: Request) {
         return NextResponse.json({ error: "Custom date required" }, { status: 400 });
       }
       endDate = startOfDay(new Date(input.customDate));
+      const maxDate = new Date(now);
+      maxDate.setFullYear(maxDate.getFullYear() + 1);
+      if (endDate.getTime() > maxDate.getTime()) {
+        return NextResponse.json({ error: "Pause end date cannot exceed one year from today" }, { status: 400 });
+      }
     }
 
     await prisma.pauseWindow.updateMany({
