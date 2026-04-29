@@ -1,6 +1,6 @@
 # ZC-VIOS Core v1.1.1-alpha
 
-## Creator Workflow and Revenue Planning Workspace
+## ## Privacy-First Creator Workflow and Revenue Planning Engine
 
 Open-source planning and measurement workspace designed to help solo creators structure design-to-commerce operations.
 
